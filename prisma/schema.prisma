@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  EN_ROUTE
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  fullName     String
+  mobileNumber String    @unique
+  email        String?   @unique
+  role         Role      @default(CUSTOMER)
+  languagePref String    @default("en")
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+}
+
+model Booking {
+  id                 String        @id @default(uuid())
+  bookingCode        String        @unique
+  customerId         String?
+  customer           User?         @relation(fields: [customerId], references: [id])
+  fullName           String
+  email              String?
+  mobileNumber       String
+  altMobile          String?
+  fullAddress        String
+  city               String
+  pincode            String
+  serviceType        String
+  acType             String
+  acBrand            String
+  problemDescription String?
+  preferredDateTime  DateTime
+  status             BookingStatus @default(PENDING)
+  amount             Float         @default(0.0)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
+}
+
+model TechnicianActivity {
+  id                String   @id @default(uuid())
+  technicianName    String
+  avatarUrl         String?
+  actionDescription String
+  bookingCode       String?
+  clientName        String?
+  location          String?
+  statusBadge       String
+  statusColor       String
+  timestamp         DateTime @default(now())
+}
+
+model SiteSetting {
+  id                    String   @id
+  brandName             String
+  emergencyPhone        String
+  supportEmail          String
+  phone                 String
+  address               String
+  workingHours          String
+  baseServiceFee        String
+  gasRefillFee          String
+  emergencyFee          String
+  smsNotifications      Boolean  @default(true)
+  emailAlerts           Boolean  @default(true)
+  autoAssignTechnicians Boolean  @default(false)
+  sessionTimeoutMins    String
+  adminPasscode         String   @default("")
+  technicianName        String?
+  technicianPhone       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
