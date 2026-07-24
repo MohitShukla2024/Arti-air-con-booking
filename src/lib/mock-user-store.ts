@@ -17,7 +17,7 @@ const memoryUsers: Map<string, StoredUser> = new Map();
 const DEFAULT_ADMIN: StoredUser = {
   id: "admin-master-001",
   fullName: "Super Admin",
-  mobileNumber: "9999999999",
+  mobileNumber: "9264173334",
   email: "admin@artiaircon.com",
   role: "ADMIN",
   passwordHash: "1d5aefc768f2290c7894131645ed5a96:05cc2f9fc4747215355f346fdbe7835992d4c59b6b98121ed248e2930c37811f8c4c4c4c1e7982c8a65017c3c85182bf9cb045106e9dd4094840d45494b980df",
@@ -25,7 +25,7 @@ const DEFAULT_ADMIN: StoredUser = {
 
 memoryUsers.set("admin@artiaircon.com", DEFAULT_ADMIN);
 memoryUsers.set("admin", DEFAULT_ADMIN);
-memoryUsers.set("9999999999", DEFAULT_ADMIN);
+memoryUsers.set("9264173334", DEFAULT_ADMIN);
 
 export function findMemoryUser(key: string): StoredUser | undefined {
   // Completely disable in-memory user lookup in production environments
