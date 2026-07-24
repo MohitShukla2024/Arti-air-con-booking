@@ -122,9 +122,11 @@ export default function HomePage() {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-[0px_8px_40px_rgba(0,102,255,0.12)] border-4 border-white">
               <Image
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuArIzaTs3SIxv-E-LEreqsUzP44_ueAoJh0j9Ze3LGVH9VBLoyZtTk5VQ0ZoOQZUR9Py_p9gA8Io5szAay4wjTPgVTvNFZDyML1A44aF_oQJgNN08MFep9DpYPkgdvwLmZ_6dfajYukjwtULlXpYcPp_Uu6OZFwVmyMzOCwmU2_tIq9A4MPwV-SC4J_kySPOB01mD0ewpq0pQSPpdmrWDalLs3Zm3K2e4AT_yCR74rTb72iE1Gx73pT"
+                src="/hero-technician.png"
                 alt="Arti Air Con Certified Technician"
                 fill
+                priority
+                quality={95}
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 className="object-cover"
               />
