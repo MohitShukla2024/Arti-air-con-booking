@@ -27,6 +27,7 @@ import {
   DollarSign,
   Lock,
   Download,
+  Menu,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/use-auth-store";
@@ -105,6 +106,7 @@ function AdminDashboardContent() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [selectedBookingDetails, setSelectedBookingDetails] = useState<AdminBookingRow | null>(null);
   const [settingsSaveState, setSettingsSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // System Settings State
   const [companySettings, setCompanySettings] = useState({
@@ -435,16 +437,36 @@ function AdminDashboardContent() {
   if (!isAuthenticated || !isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-[#191c1e] antialiased flex">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-[#191c1e] antialiased flex relative">
       {/* 1. Left Sidebar Navigation */}
-      <AdminSidebar activeTab={activeTab} onSelectTab={(tab) => setActiveTab(tab)} />
+      <AdminSidebar
+        activeTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
+
+      {/* Mobile backdrop shadow layer */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-950/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
 
       {/* 2. Main Content Area */}
-      <div className="flex-1 p-6 md:p-10 overflow-y-auto space-y-8 max-w-[1400px]">
+      <div className="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto space-y-6 md:space-y-8 max-w-[1400px]">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <h1 className="font-display text-xl font-bold text-[#0050cb] capitalize">
+        <div className="flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              className="md:hidden p-2 rounded-xl text-[#0050cb] hover:bg-blue-50 border border-blue-100 transition-colors"
+              aria-label="Toggle Navigation Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="font-display text-lg sm:text-xl font-bold text-[#0050cb] capitalize">
               {activeTab === "dashboard" && "Dashboard Overview"}
               {activeTab === "bookings" && "Bookings Management"}
               {activeTab === "customers" && "Customer Directory & CRM"}
