@@ -1,105 +1,110 @@
-// Firebase Cloud Messaging Service Worker for Arti Air Con
+// Firebase Cloud Messaging & Web Push Service Worker for Arti Air Con
 /* eslint-disable no-undef */
 
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
 
-// Initialize Firebase App in Service Worker (Default / Fallback config)
-// The service worker will receive push payloads sent via FCM Server
 const firebaseConfig = {
-  apiKey: "placeholder",
-  authDomain: "placeholder",
-  projectId: "placeholder",
-  storageBucket: "placeholder",
-  messagingSenderId: "placeholder",
-  appId: "placeholder",
+  apiKey: "AIzaSyDummyKeyForSwInit00123456789",
+  authDomain: "arti-air-con.firebaseapp.com",
+  projectId: "arti-air-con",
+  storageBucket: "arti-air-con.appspot.com",
+  messagingSenderId: "100000000000",
+  appId: "1:100000000000:web:dummyappid001",
 };
 
 if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (err) {
+    console.warn("Firebase SW init warning:", err);
+  }
 }
 
-const messaging = firebase.messaging();
+let messaging = null;
+try {
+  messaging = firebase.messaging();
+} catch (e) {
+  console.warn("Firebase messaging SW unavailable:", e);
+}
 
-// Handle background messages
-messaging.onBackgroundMessage((payload) => {
-  console.log("[firebase-messaging-sw.js] Received background message:", payload);
+// Background FCM Message Handler (Triggers when site is closed or in background)
+if (messaging) {
+  messaging.onBackgroundMessage((payload) => {
+    const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update 🔔";
+    const body = payload.notification?.body || payload.data?.body || "You have a new update regarding your booking.";
+    const icon = payload.notification?.icon || payload.data?.icon || "/hero-technician.png";
+    const targetUrl = payload.data?.url || (payload.data?.role === "ADMIN" ? "/admin/dashboard" : "/dashboard");
 
-  const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update";
-  const body = payload.notification?.body || payload.data?.body || "You have a new update regarding your service.";
-  const icon = payload.notification?.icon || payload.data?.icon || "/hero-technician.png";
-  const clickActionUrl = payload.data?.url || (payload.data?.role === "ADMIN" ? "/admin/bookings" : "/dashboard");
+    const options = {
+      body,
+      icon,
+      badge: icon,
+      data: { url: targetUrl, bookingId: payload.data?.bookingId },
+      vibrate: [200, 100, 200, 100, 200],
+      tag: payload.data?.bookingId || "arti-ac-push",
+      renotify: true,
+      requireInteraction: true,
+    };
 
-  const notificationOptions = {
-    body,
-    icon,
-    badge: "/hero-technician.png",
-    timestamp: Date.now(),
-    data: {
-      url: clickActionUrl,
-      bookingId: payload.data?.bookingId || null,
-    },
-    vibrate: [200, 100, 200],
-    tag: payload.data?.bookingId || "arti-ac-notification",
-    renotify: true,
-  };
+    return self.registration.showNotification(title, options);
+  });
+}
 
-  return self.registration.showNotification(title, notificationOptions);
-});
-
-// Direct Web Push fallback event listener
+// Native Web Push Fallback Event Listener
 self.addEventListener("push", (event) => {
+  let title = "Arti Air Con Update 🔔";
+  let body = "Click to view your booking update.";
+  let targetUrl = "/dashboard";
+  let icon = "/hero-technician.png";
+
   if (event.data) {
     try {
       const data = event.data.json();
-      console.log("[firebase-messaging-sw.js] Web Push event payload:", data);
-      
-      // If notification property exists, onBackgroundMessage might handle it, but fallback ensures display
-      const title = data.notification?.title || data.data?.title || "Arti Air Con Notification";
-      const body = data.notification?.body || data.data?.body || "Click to view details.";
-      const icon = data.notification?.icon || data.data?.icon || "/hero-technician.png";
-      const clickActionUrl = data.data?.url || "/dashboard";
-
-      const options = {
-        body,
-        icon,
-        badge: "/hero-technician.png",
-        data: { url: clickActionUrl, ...data.data },
-        tag: data.data?.bookingId || "arti-push-tag",
-      };
-
-      event.waitUntil(self.registration.showNotification(title, options));
-    } catch (e) {
-      console.error("[firebase-messaging-sw.js] Failed to parse push event payload:", e);
+      title = data.notification?.title || data.data?.title || title;
+      body = data.notification?.body || data.data?.body || body;
+      icon = data.notification?.icon || data.data?.icon || icon;
+      targetUrl = data.data?.url || targetUrl;
+    } catch {
+      try {
+        body = event.data.text() || body;
+      } catch {}
     }
   }
+
+  const options = {
+    body,
+    icon,
+    badge: icon,
+    data: { url: targetUrl },
+    vibrate: [200, 100, 200, 100, 200],
+    tag: "arti-push-bg-" + Date.now(),
+    renotify: true,
+    requireInteraction: true,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Handle Notification Click action
+// Notification Click Handler (Opens website when phone notification banner is tapped)
 self.addEventListener("notificationclick", (event) => {
-  console.log("[firebase-messaging-sw.js] Notification click received:", event.notification);
   event.notification.close();
-
   const targetUrl = event.notification.data?.url || "/dashboard";
 
   event.waitUntil(
-    clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((clientList) => {
-        // If a window is already open, focus it and navigate to the target URL
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && "focus" in client) {
-            client.focus();
-            if ("navigate" in client) {
-              return client.navigate(targetUrl);
-            }
-            return;
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.focus();
+          if ("navigate" in client) {
+            return client.navigate(targetUrl);
           }
+          return;
         }
-        // Otherwise, open a new window
-        if (clients.openWindow) {
-          return clients.openWindow(targetUrl);
-        }
-      })
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
   );
 });

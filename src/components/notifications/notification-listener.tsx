@@ -13,15 +13,13 @@ export function NotificationListener() {
   const router = useRouter();
   const currentTokenRef = useRef<string | null>(null);
 
-  // Sync token whenever authentication status or user changes
+  // Auto-register background service worker whenever permission is granted
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
-
-    if (typeof window === "undefined" || !("Notification" in window)) return;
+    if (typeof window === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)) return;
 
     if (Notification.permission === "granted") {
       getFcmToken().then(async (token) => {
-        if (token && token !== currentTokenRef.current) {
+        if (token && isAuthenticated && user && token !== currentTokenRef.current) {
           currentTokenRef.current = token;
           try {
             await fetch("/api/notifications/register", {
