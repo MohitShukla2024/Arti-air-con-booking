@@ -24,12 +24,13 @@ export function NotificationListener() {
           const token = await getFcmToken();
           if (token && token !== currentTokenRef.current) {
             currentTokenRef.current = token;
+            const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
             await fetch("/api/notifications/register", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ fcmToken: token, deviceType: "web" }),
+              body: JSON.stringify({ fcmToken: token, deviceType: isMobileDevice ? "mobile" : "desktop" }),
             });
-            console.log("[Notification Listener] Registered FCM token for user:", user.id);
+            console.log("[Notification Listener] Registered FCM token for user:", user.id, "Device:", isMobileDevice ? "mobile" : "desktop");
           }
         } catch (error) {
           console.error("[Notification Listener] Token registration error:", error);
@@ -60,8 +61,10 @@ export function NotificationListener() {
         bookingId: payload.data?.bookingId,
       });
 
-      // 1. Native System OS Notification (Phone Notification Bar like WhatsApp / Instagram)
-      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+      // 1. Native System OS Notification (Triggered ONLY on Mobile Phones like WhatsApp / SMS)
+      const isMobileDevice = typeof window !== "undefined" && (/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768);
+
+      if (isMobileDevice && typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
         try {
           if ("serviceWorker" in navigator) {
             navigator.serviceWorker.ready.then((registration) => {

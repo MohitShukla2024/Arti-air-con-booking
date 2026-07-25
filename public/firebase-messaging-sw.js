@@ -59,7 +59,7 @@ const firebaseConfig = {
   projectId: "artiaircon-96905",
   authDomain: "artiaircon-96905.firebaseapp.com",
   storageBucket: "artiaircon-96905.appspot.com",
-  messagingSenderId: "103829534695513028182",
+  messagingSenderId: "538851500118",
   appId: "1:538851500118:web:ef2a44578c2edc63cc9bf7",
 };
 

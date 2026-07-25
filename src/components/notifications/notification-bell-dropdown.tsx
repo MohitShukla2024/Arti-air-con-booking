@@ -236,7 +236,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
               </div>
             </div>
 
-            {/* Push Notification Mobile Activation Banner */}
+            {/* Push Notification Activation Banner (Default / Prompt) */}
             {permissionStatus === "default" && (
               <div className="p-3 bg-blue-50 dark:bg-blue-950/60 border-b border-blue-100 dark:border-blue-900 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-blue-900 dark:text-blue-200">
@@ -252,6 +252,27 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
                 >
                   Turn On
                 </button>
+              </div>
+            )}
+
+            {/* Push Notification Denied Diagnostic Banner */}
+            {permissionStatus === "denied" && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 flex items-center gap-2 text-amber-900 dark:text-amber-200">
+                <Bell className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div className="text-xs">
+                  <p className="font-bold text-amber-800 dark:text-amber-300">Notifications Blocked in Chrome</p>
+                  <p className="text-[10px] text-amber-700 dark:text-amber-400 mt-0.5 leading-tight">
+                    Tap lock icon 🔒 near URL bar ➔ Site Settings ➔ Allow Notifications.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Push Notification Active Banner */}
+            {permissionStatus === "granted" && (
+              <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 border-b border-emerald-100 dark:border-emerald-900/40 flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                Instant Push Notifications Active 🔔
               </div>
             )}
 

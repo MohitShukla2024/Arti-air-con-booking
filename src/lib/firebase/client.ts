@@ -6,7 +6,7 @@ const firebaseConfig = {
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "artiaircon-96905.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "artiaircon-96905",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "artiaircon-96905.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "103829534695513028182",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "538851500118",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:538851500118:web:ef2a44578c2edc63cc9bf7",
 };
 
@@ -89,10 +89,23 @@ export async function getFcmToken(): Promise<string | null> {
       process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY ||
       "BGr3824FDoaD0v2VJ8x8QuVVJvsdfZBveBGjTUQhES4ZWe3dt95Cq7m8BILK-QcLF7N84a_-cS0MutvAbNuLNE4";
 
-    const currentToken = await getToken(messaging, {
-      serviceWorkerRegistration: registration,
-      vapidKey: vapidKey || undefined,
-    });
+    let currentToken: string | null = null;
+
+    try {
+      currentToken = await getToken(messaging, {
+        serviceWorkerRegistration: registration,
+        vapidKey: vapidKey || undefined,
+      });
+    } catch (vapidErr) {
+      console.warn("[FCM Client] getToken with VAPID key failed, attempting without VAPID key:", vapidErr);
+      try {
+        currentToken = await getToken(messaging, {
+          serviceWorkerRegistration: registration,
+        });
+      } catch (err2) {
+        console.error("[FCM Client] getToken fallback without VAPID key also failed:", err2);
+      }
+    }
 
     if (currentToken) {
       return currentToken;
