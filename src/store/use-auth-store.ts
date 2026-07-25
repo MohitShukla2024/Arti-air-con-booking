@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { UserProfile } from "@/types";
+import { unregisterFcmToken } from "@/lib/firebase/client";
 
 interface AuthState {
   user: UserProfile | null;
@@ -48,6 +49,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     })),
   logout: async () => {
     try {
+      await unregisterFcmToken();
+    } catch (e) {
+      console.warn("[AuthStore] Token unregister warning:", e);
+    }
+    try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch (err) {
       console.error("[AuthStore] Logout fetch error:", err);
@@ -60,6 +66,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
   logoutAdmin: async () => {
+    try {
+      await unregisterFcmToken();
+    } catch (e) {
+      console.warn("[AuthStore] Token unregister warning:", e);
+    }
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch (err) {

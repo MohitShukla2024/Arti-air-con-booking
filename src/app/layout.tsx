@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
@@ -6,6 +6,7 @@ import { AuthHydrator } from "@/components/shared/auth-hydrator";
 import { SettingsHydrator } from "@/components/shared/settings-hydrator";
 import { NotificationPermissionModal } from "@/components/notifications/notification-permission-modal";
 import { NotificationListener } from "@/components/notifications/notification-listener";
+import { PwaInstallPrompt } from "@/components/pwa/pwa-install-prompt";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -21,11 +22,24 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#0066ff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://artiaircon.com"),
   title: "Arti Air Con | Professional AC Services",
   description: "Get expert care for your air conditioner today. From routine maintenance to complex repairs, we ensure your home stays cool and comfortable.",
   keywords: ["AC repair", "AC service", "Air conditioning", "Arti Air Con", "AC installation", "Gas filling"],
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Arti Air Con",
+  },
   openGraph: {
     title: "Arti Air Con | Professional AC Services",
     description: "Expert air conditioner repair, installation, and maintenance services.",
@@ -56,6 +70,7 @@ export default function RootLayout({
         <SettingsHydrator />
         <NotificationListener />
         <NotificationPermissionModal />
+        <PwaInstallPrompt />
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         {children}
       </body>

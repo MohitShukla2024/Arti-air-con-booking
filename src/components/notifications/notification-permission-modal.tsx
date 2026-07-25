@@ -34,10 +34,10 @@ export function NotificationPermissionModal() {
       }
     }
 
-    // Show modal after 1 second
+    // Show modal after 1.2 seconds delay or interaction
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 1000);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, []);
@@ -99,12 +99,12 @@ export function NotificationPermissionModal() {
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5" /> Instant Updates
             </span>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Enable Notifications</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Stay Updated!</h3>
           </div>
         </div>
 
         <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-          Allow notifications to receive instant booking updates, technician arrival status, and service alerts right on your device.
+          Enable notifications to receive instant booking updates, technician arrival status, and service alerts right on your phone or device.
         </p>
 
         <div className="flex items-center justify-end gap-3">
@@ -120,7 +120,7 @@ export function NotificationPermissionModal() {
             type="button"
             onClick={handleAllow}
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-xl bg-[#0066ff] hover:bg-[#0050cb] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 active:scale-95 transition-all disabled:opacity-50"
           >
             {loading ? "Enabling..." : "Allow Notifications"}
           </button>

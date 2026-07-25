@@ -4,13 +4,62 @@
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
 
+const CACHE_NAME = "arti-air-con-cache-v1";
+const OFFLINE_URL = "/offline";
+const PRECACHE_ASSETS = [
+  "/offline",
+  "/hero-technician.png",
+  "/favicon.ico",
+];
+
+// Service Worker Install
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(PRECACHE_ASSETS).catch((err) => {
+        console.warn("[SW] Cache prefetch warning:", err);
+      });
+    })
+  );
+  self.skipWaiting();
+});
+
+// Service Worker Activate
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Offline Fetch Handler (Navigation fallback)
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(OFFLINE_URL).then((response) => {
+          return response || new Response("You are offline.", { headers: { "Content-Type": "text/html" } });
+        });
+      })
+    );
+  }
+});
+
+// Initialize Firebase App with User's Project Config
 const firebaseConfig = {
-  apiKey: "AIzaSyDummyKeyForSwInit00123456789",
-  authDomain: "arti-air-con.firebaseapp.com",
-  projectId: "arti-air-con",
-  storageBucket: "arti-air-con.appspot.com",
-  messagingSenderId: "100000000000",
-  appId: "1:100000000000:web:dummyappid001",
+  projectId: "artiaircon-96905",
+  authDomain: "artiaircon-96905.firebaseapp.com",
+  storageBucket: "artiaircon-96905.appspot.com",
+  messagingSenderId: "103829534695513028182",
+  appId: "1:103829534695513028182:web:artiaircon96905app",
 };
 
 if (!firebase.apps.length) {
@@ -28,13 +77,13 @@ try {
   console.warn("Firebase messaging SW unavailable:", e);
 }
 
-// Background FCM Message Handler (Triggers when site is closed or in background)
+// Background FCM Message Handler (Triggers when site is closed, minimized, or screen locked)
 if (messaging) {
   messaging.onBackgroundMessage((payload) => {
     const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update 🔔";
     const body = payload.notification?.body || payload.data?.body || "You have a new update regarding your booking.";
     const icon = payload.notification?.icon || payload.data?.icon || "/hero-technician.png";
-    const targetUrl = payload.data?.url || (payload.data?.role === "ADMIN" ? "/admin/dashboard" : "/dashboard");
+    const targetUrl = payload.data?.url || (payload.data?.role === "ADMIN" ? "/admin/bookings" : "/dashboard");
 
     const options = {
       body,
@@ -42,7 +91,7 @@ if (messaging) {
       badge: icon,
       data: { url: targetUrl, bookingId: payload.data?.bookingId },
       vibrate: [200, 100, 200, 100, 200],
-      tag: payload.data?.bookingId || "arti-ac-push",
+      tag: payload.data?.bookingId || `arti-ac-push-${Date.now()}`,
       renotify: true,
       requireInteraction: true,
     };

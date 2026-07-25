@@ -2,12 +2,12 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, Messaging, MessagePayload } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyArtiaircon96905ClientApiKeyFallback",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "artiaircon-96905.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "artiaircon-96905",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "artiaircon-96905.appspot.com",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "103829534695513028182",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:103829534695513028182:web:artiaircon96905app",
 };
 
 let firebaseApp: FirebaseApp | null = null;
@@ -15,17 +15,6 @@ let messagingInstance: Messaging | null = null;
 
 export function getFirebaseApp(): FirebaseApp | null {
   if (typeof window === "undefined") return null;
-
-  // Verify that valid non-placeholder API key and App ID are present
-  if (
-    !firebaseConfig.apiKey ||
-    firebaseConfig.apiKey.includes("your-") ||
-    !firebaseConfig.projectId ||
-    !firebaseConfig.appId ||
-    firebaseConfig.appId.includes("your-")
-  ) {
-    return null;
-  }
 
   if (!firebaseApp) {
     try {
@@ -96,10 +85,9 @@ export async function getFcmToken(): Promise<string | null> {
 
     await navigator.serviceWorker.ready;
 
-    const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-    if (!vapidKey) {
-      console.warn("[FCM Client] NEXT_PUBLIC_FIREBASE_VAPID_KEY is not defined.");
-    }
+    const vapidKey =
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY ||
+      "BGr3824FDoaD0v2VJ8x8QuVVJvsdfZBveBGjTUQhES4ZWe3dt95Cq7m8BILK-QcLF7N84a_-cS0MutvAbNuLNE4";
 
     const currentToken = await getToken(messaging, {
       serviceWorkerRegistration: registration,
@@ -109,13 +97,34 @@ export async function getFcmToken(): Promise<string | null> {
     if (currentToken) {
       return currentToken;
     } else {
-      console.warn("[FCM Client] No registration token available. Request permission to generate one.");
+      console.warn("[FCM Client] No registration token available.");
       return null;
     }
   } catch (error) {
     console.error("[FCM Client] Error retrieving FCM Token:", error);
     return null;
   }
+}
+
+/**
+ * Unregister FCM Token from backend on logout
+ */
+export async function unregisterFcmToken(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const token = await getFcmToken();
+    if (token) {
+      await fetch("/api/notifications/unregister", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fcmToken: token }),
+      });
+      return true;
+    }
+  } catch (err) {
+    console.error("[FCM Client] Error unregistering token:", err);
+  }
+  return false;
 }
 
 /**

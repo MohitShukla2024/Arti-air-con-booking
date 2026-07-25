@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0040B3"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+  <g filter="url(#shadow)" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" transform="translate(106, 106)">
+    <!-- Snowflake Icon -->
+    <line x1="150" y1="20" x2="150" y2="280"/>
+    <line x1="20" y1="150" x2="280" y2="150"/>
+    <line x1="58" y1="58" x2="242" y2="242"/>
+    <line x1="242" y1="58" x2="58" y2="242"/>
+    <path d="M150,60 L120,90 M150,60 L180,90"/>
+    <path d="M150,240 L120,210 M150,240 L180,210"/>
+    <path d="M60,150 L90,120 M60,150 L90,180"/>
+    <path d="M240,150 L210,120 M240,150 L210,180"/>
+  </g>
+</svg>
