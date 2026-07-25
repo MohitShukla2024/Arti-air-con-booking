@@ -84,3 +84,40 @@ export async function PATCH(request: Request) {
     return handleServerError("PATCH /api/notifications", error, "Unable to update notification.");
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const user = await getRequestUser(request);
+    if (!user) return unauthorizedResponse();
+
+    const body = (await request.json().catch(() => ({}))) as { notificationId?: string };
+
+    const prisma = getPrisma();
+    if (prisma) {
+      if (body.notificationId) {
+        await prisma.notification.deleteMany({
+          where: {
+            id: body.notificationId,
+            OR: [
+              { userId: user.id },
+              { role: user.role as Role },
+            ],
+          },
+        });
+      } else {
+        await prisma.notification.deleteMany({
+          where: {
+            OR: [
+              { userId: user.id },
+              { role: user.role as Role },
+            ],
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "Notifications deleted successfully" });
+  } catch (error) {
+    return handleServerError("DELETE /api/notifications", error, "Unable to delete notifications.");
+  }
+}

@@ -13,26 +13,33 @@ export function NotificationListener() {
   const router = useRouter();
   const currentTokenRef = useRef<string | null>(null);
 
-  // Auto-register background service worker whenever permission is granted
+  // Auto-register background FCM token with server database
   useEffect(() => {
     if (typeof window === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)) return;
+    if (!isAuthenticated || !user) return;
 
-    if (Notification.permission === "granted") {
-      getFcmToken().then(async (token) => {
-        if (token && isAuthenticated && user && token !== currentTokenRef.current) {
-          currentTokenRef.current = token;
-          try {
+    const registerToken = async () => {
+      if (Notification.permission === "granted") {
+        try {
+          const token = await getFcmToken();
+          if (token && token !== currentTokenRef.current) {
+            currentTokenRef.current = token;
             await fetch("/api/notifications/register", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ fcmToken: token, deviceType: "web" }),
             });
-          } catch (error) {
-            console.error("[Notification Listener] Token registration error:", error);
+            console.log("[Notification Listener] Registered FCM token for user:", user.id);
           }
+        } catch (error) {
+          console.error("[Notification Listener] Token registration error:", error);
         }
-      });
-    }
+      }
+    };
+
+    registerToken();
+    const interval = setInterval(registerToken, 5000); // Check every 5s if permission is granted
+    return () => clearInterval(interval);
   }, [isAuthenticated, user]);
 
   // Subscribe to real-time foreground messages
@@ -46,6 +53,7 @@ export function NotificationListener() {
 
       // Store notification in Zustand persistent store
       useNotificationStore.getState().addNotification({
+        id: payload.data?.bookingId ? `notif-${payload.data.bookingId}` : undefined,
         title,
         body,
         url: targetUrl,

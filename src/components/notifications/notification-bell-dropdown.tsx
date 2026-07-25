@@ -33,7 +33,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
 
-  const { notifications, markAsRead, markAllAsRead, clearAll } = useNotificationStore();
+  const { notifications, setNotifications, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotificationStore();
 
   const currentUserRole = user?.role || "CUSTOMER";
   const userNotifications = notifications.filter((n) => {
@@ -59,23 +59,24 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
           bookingId?: string;
           role: "ADMIN" | "CUSTOMER";
         }
-        data.notifications.forEach((sn: ServerNotification) => {
-          const exists = useNotificationStore.getState().notifications.some((n) => n.id === sn.id);
-          if (!exists) {
-            useNotificationStore.getState().addNotification({
-              title: sn.title,
-              body: sn.body,
-              url: sn.role === "ADMIN" ? "/admin/bookings" : "/dashboard",
-              bookingId: sn.bookingId,
-              role: sn.role,
-            });
-          }
-        });
+
+        const serverList: AppNotification[] = data.notifications.map((sn: ServerNotification) => ({
+          id: sn.id,
+          title: sn.title,
+          body: sn.body,
+          url: sn.role === "ADMIN" ? "/admin/bookings" : "/dashboard",
+          bookingId: sn.bookingId,
+          role: sn.role,
+          read: sn.readStatus,
+          timestamp: sn.createdAt,
+        }));
+
+        setNotifications(serverList);
       }
     } catch {
-      // Ignore offline sync warning
+      // Offline fallback
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setNotifications]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -91,7 +92,14 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
       if (res === "granted") {
         setPermissionStatus("granted");
         toast.success("Phone Notifications Enabled! 🔔");
-        await getFcmToken();
+        const token = await getFcmToken();
+        if (token) {
+          await fetch("/api/notifications/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fcmToken: token, deviceType: "web" }),
+          });
+        }
       } else {
         setPermissionStatus("denied");
         toast.error("Notification permission blocked in browser settings.");
@@ -131,6 +139,23 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ markAll: true }),
+    }).catch(() => {});
+  };
+
+  const handleClearAll = () => {
+    clearAll();
+    fetch("/api/notifications", {
+      method: "DELETE",
+    }).catch(() => {});
+  };
+
+  const handleDeleteItem = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    deleteNotification(id);
+    fetch("/api/notifications", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notificationId: id }),
     }).catch(() => {});
   };
 
@@ -193,13 +218,13 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
                     <CheckCheck className="w-3.5 h-3.5" /> Read All
                   </button>
                 )}
-                {notifications.length > 0 && (
+                {userNotifications.length > 0 && (
                   <button
-                    onClick={clearAll}
-                    className="text-xs text-slate-400 hover:text-red-500 font-medium p-1 transition-colors"
-                    title="Clear notifications"
+                    onClick={handleClearAll}
+                    className="text-xs text-slate-400 hover:text-red-500 font-medium p-1 transition-colors flex items-center gap-1"
+                    title="Delete all notifications"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3.5 h-3.5" /> Clear All
                   </button>
                 )}
                 <button
@@ -243,7 +268,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
                   <div
                     key={item.id}
                     onClick={() => handleItemClick(item.id, item.url)}
-                    className={`p-3.5 transition-colors cursor-pointer flex gap-3 items-start relative hover:bg-slate-50 dark:hover:bg-slate-800/60 ${
+                    className={`p-3.5 transition-colors cursor-pointer flex gap-3 items-start relative hover:bg-slate-50 dark:hover:bg-slate-800/60 group ${
                       !item.read ? "bg-blue-50/40 dark:bg-blue-950/20" : ""
                     }`}
                   >
@@ -261,10 +286,19 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
                         >
                           {item.title}
                         </p>
-                        <span className="text-[10px] text-slate-400 font-medium shrink-0 flex items-center gap-0.5">
-                          <Calendar className="w-2.5 h-2.5" />
-                          {formatRelativeTime(item.timestamp)}
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[10px] text-slate-400 font-medium flex items-center gap-0.5">
+                            <Calendar className="w-2.5 h-2.5" />
+                            {formatRelativeTime(item.timestamp)}
+                          </span>
+                          <button
+                            onClick={(e) => handleDeleteItem(e, item.id)}
+                            className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5 transition-all"
+                            title="Delete notification"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
 
                       <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-3 leading-relaxed">
