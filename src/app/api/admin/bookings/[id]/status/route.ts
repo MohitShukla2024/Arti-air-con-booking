@@ -10,33 +10,39 @@ function buildNotificationPayload(status: string, bookingCode: string) {
   switch (status) {
     case "ACCEPTED":
       return {
-        title: "Booking Accepted 🚀",
-        body: `Your booking ${bookingCode} has been accepted. Technician is assigned.`,
+        title: "Booking Accepted",
+        body: `Your booking has been accepted. Booking ID: ${bookingCode}. Tap to view details.`,
+        type: "BOOKING_ACCEPTED",
       };
     case "COMPLETED":
       return {
-        title: "Booking Completed ✅",
-        body: `Your AC service for booking ${bookingCode} has been completed successfully.`,
+        title: "Service Completed",
+        body: `Your AC service has been completed successfully. Thank you for choosing Arti Air Con. (Booking ID: ${bookingCode})`,
+        type: "BOOKING_COMPLETED",
       };
     case "CANCELLED":
       return {
-        title: "Booking Cancelled ❌",
-        body: `Your booking ${bookingCode} has been cancelled by admin.`,
+        title: "Booking Cancelled",
+        body: `Your booking ${bookingCode} has been cancelled. Please contact us for more information.`,
+        type: "BOOKING_CANCELLED",
       };
     case "EN_ROUTE":
       return {
-        title: "Technician En Route 🛵",
+        title: "Technician En Route",
         body: `Your technician is on the way for booking ${bookingCode}.`,
+        type: "BOOKING_EN_ROUTE",
       };
     case "IN_PROGRESS":
       return {
-        title: "Service In Progress 🔧",
+        title: "Service In Progress",
         body: `Work has started on your booking ${bookingCode}.`,
+        type: "BOOKING_IN_PROGRESS",
       };
     default:
       return {
-        title: "Booking Status Update 🔔",
+        title: "Booking Status Update",
         body: `Your booking ${bookingCode} status has been updated to ${status}.`,
+        type: "BOOKING_UPDATE",
       };
   }
 }

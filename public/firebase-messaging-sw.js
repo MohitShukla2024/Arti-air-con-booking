@@ -53,13 +53,14 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// Initialize Firebase App with User's Project Config
+// Initialize Firebase App with User's Exact Project Config
 const firebaseConfig = {
+  apiKey: "AIzaSyCkejax3n4jg1MToXieMp2mQwVLjRshGbQ",
   projectId: "artiaircon-96905",
   authDomain: "artiaircon-96905.firebaseapp.com",
   storageBucket: "artiaircon-96905.appspot.com",
   messagingSenderId: "103829534695513028182",
-  appId: "1:103829534695513028182:web:artiaircon96905app",
+  appId: "1:538851500118:web:ef2a44578c2edc63cc9bf7",
 };
 
 if (!firebase.apps.length) {
@@ -82,7 +83,7 @@ if (messaging) {
   messaging.onBackgroundMessage((payload) => {
     const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update 🔔";
     const body = payload.notification?.body || payload.data?.body || "You have a new update regarding your booking.";
-    const icon = payload.notification?.icon || payload.data?.icon || "/hero-technician.png";
+    const icon = payload.notification?.icon || payload.data?.icon || "/icons/icon-192.png";
     const targetUrl = payload.data?.url || (payload.data?.role === "ADMIN" ? "/admin/bookings" : "/dashboard");
 
     const options = {
@@ -105,7 +106,7 @@ self.addEventListener("push", (event) => {
   let title = "Arti Air Con Update 🔔";
   let body = "Click to view your booking update.";
   let targetUrl = "/dashboard";
-  let icon = "/hero-technician.png";
+  let icon = "/icons/icon-192.png";
 
   if (event.data) {
     try {

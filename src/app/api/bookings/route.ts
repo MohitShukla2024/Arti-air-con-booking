@@ -143,12 +143,13 @@ export async function POST(request: Request) {
           },
         });
 
-        // Trigger real-time FCM notification to all Admins
+        // Trigger real-time FCM notification & DB record for all Admins
         sendFcmNotificationToRole("ADMIN", {
           title: "New Booking Received",
-          body: `Customer ${parsed.data.fullName} booked ${parsed.data.serviceType}.`,
+          body: `Customer ${parsed.data.fullName} requested ${parsed.data.serviceType}. Booking ID: ${createdBooking.bookingCode}`,
           url: "/admin/bookings",
           bookingId: createdBooking.id,
+          type: "BOOKING_CREATED",
         }).catch((err) => console.error("[POST /api/bookings] Admin FCM notification error:", err));
 
         return NextResponse.json({
@@ -191,9 +192,10 @@ export async function POST(request: Request) {
     // Trigger real-time FCM notification to all Admins (in-memory mode)
     sendFcmNotificationToRole("ADMIN", {
       title: "New Booking Received",
-      body: `Customer ${parsed.data.fullName} booked ${parsed.data.serviceType}.`,
+      body: `Customer ${parsed.data.fullName} requested ${parsed.data.serviceType}. Booking ID: ${bookingCode}`,
       url: "/admin/bookings",
       bookingId: newBookingObj.id,
+      type: "BOOKING_CREATED",
     }).catch((err) => console.error("[POST /api/bookings] Admin FCM notification error:", err));
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 import { getApps, initializeApp, cert, App } from "firebase-admin/app";
 import { getMessaging, MulticastMessage, SendResponse } from "firebase-admin/messaging";
 import { getPrisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 import {
   getInMemoryFcmTokensForUser,
   getInMemoryFcmTokensForRole,
@@ -15,6 +16,7 @@ export interface NotificationPayload {
   url?: string;
   bookingId?: string;
   role?: "ADMIN" | "CUSTOMER";
+  type?: string;
   data?: Record<string, string>;
 }
 
@@ -73,13 +75,34 @@ async function removeInvalidToken(token: string) {
 }
 
 /**
- * Send FCM push notification to all active devices of a specific User ID
+ * Send FCM push notification & persist Notification record for a specific User ID
  */
-export async function sendFcmNotificationToUser(userId: string, payload: NotificationPayload): Promise<{ successCount: number; failureCount: number }> {
-  const tokensSet = new Set<string>();
-
-  // 1. Fetch tokens from database
+export async function sendFcmNotificationToUser(
+  userId: string,
+  payload: NotificationPayload
+): Promise<{ successCount: number; failureCount: number }> {
+  // 1. Persist Notification record in Database
   const prisma = getPrisma();
+  if (prisma) {
+    try {
+      await prisma.notification.create({
+        data: {
+          userId,
+          bookingId: payload.bookingId || null,
+          role: (payload.role || "CUSTOMER") as Role,
+          title: payload.title,
+          body: payload.body,
+          type: payload.type || "SYSTEM",
+          readStatus: false,
+        },
+      });
+    } catch (dbErr) {
+      console.error("[FCM Server] DB Notification create error for user:", dbErr);
+    }
+  }
+
+  // 2. Resolve FCM Device Tokens
+  const tokensSet = new Set<string>();
   if (prisma) {
     try {
       const dbTokens = await prisma.fcmToken.findMany({
@@ -92,20 +115,17 @@ export async function sendFcmNotificationToUser(userId: string, payload: Notific
     }
   }
 
-  // 2. Fetch tokens from in-memory fallback
   const inMemTokens = getInMemoryFcmTokensForUser(userId);
   inMemTokens.forEach((t) => tokensSet.add(t));
 
   const targetTokens = Array.from(tokensSet);
 
   if (targetTokens.length === 0) {
-    console.log(`[FCM Server] No FCM tokens registered for user ${userId}. Skipping push.`);
+    console.log(`[FCM Server] Notification persisted to DB. No FCM tokens registered for user ${userId}. Skipping push.`);
     return { successCount: 0, failureCount: 0 };
   }
 
   const app = initFirebaseAdmin();
-
-  // Mock send mode if Firebase Admin is not configured
   if (!app) {
     console.log(`[FCM Server MOCK PUSH] Sent to User [${userId}] (${targetTokens.length} tokens):`, {
       title: payload.title,
@@ -181,16 +201,37 @@ export async function sendFcmNotificationToUser(userId: string, payload: Notific
 }
 
 /**
- * Send FCM push notification to all users with a specified Role ("ADMIN" or "CUSTOMER")
+ * Send FCM push notification & persist Notification record for a specified Role ("ADMIN" or "CUSTOMER")
  */
-export async function sendFcmNotificationToRole(role: "ADMIN" | "CUSTOMER", payload: NotificationPayload): Promise<{ successCount: number; failureCount: number }> {
-  const tokensSet = new Set<string>();
-
+export async function sendFcmNotificationToRole(
+  role: "ADMIN" | "CUSTOMER",
+  payload: NotificationPayload
+): Promise<{ successCount: number; failureCount: number }> {
+  // 1. Persist Notification record in Database
   const prisma = getPrisma();
   if (prisma) {
     try {
+      await prisma.notification.create({
+        data: {
+          role: role as Role,
+          bookingId: payload.bookingId || null,
+          title: payload.title,
+          body: payload.body,
+          type: payload.type || "SYSTEM",
+          readStatus: false,
+        },
+      });
+    } catch (dbErr) {
+      console.error(`[FCM Server] DB Notification create error for role ${role}:`, dbErr);
+    }
+  }
+
+  // 2. Resolve FCM Device Tokens
+  const tokensSet = new Set<string>();
+  if (prisma) {
+    try {
       const dbTokens = await prisma.fcmToken.findMany({
-        where: { user: { role } },
+        where: { user: { role: role as Role } },
         select: { token: true },
       });
       dbTokens.forEach((t) => tokensSet.add(t.token));
@@ -199,11 +240,9 @@ export async function sendFcmNotificationToRole(role: "ADMIN" | "CUSTOMER", payl
     }
   }
 
-  // Also check in-memory tokens
   const inMemTokens = getInMemoryFcmTokensForRole(role);
   inMemTokens.forEach((t) => tokensSet.add(t));
 
-  // If in-memory tokens don't explicitly have role set, check if token owner has ADMIN role in mock users
   if (role === "ADMIN") {
     inMemoryFcmTokens.forEach((t) => {
       if (t.userRole === "ADMIN") tokensSet.add(t.token);
@@ -213,12 +252,11 @@ export async function sendFcmNotificationToRole(role: "ADMIN" | "CUSTOMER", payl
   const targetTokens = Array.from(tokensSet);
 
   if (targetTokens.length === 0) {
-    console.log(`[FCM Server] No FCM tokens registered for role ${role}. Skipping push.`);
+    console.log(`[FCM Server] Notification persisted to DB. No FCM tokens registered for role ${role}. Skipping push.`);
     return { successCount: 0, failureCount: 0 };
   }
 
   const app = initFirebaseAdmin();
-
   if (!app) {
     console.log(`[FCM Server MOCK PUSH] Sent to Role [${role}] (${targetTokens.length} tokens):`, {
       title: payload.title,

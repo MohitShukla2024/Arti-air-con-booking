@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, CheckCheck, Trash2, Calendar, ExternalLink, X } from "lucide-react";
-import { useNotificationStore } from "@/store/use-notification-store";
+import { useNotificationStore, AppNotification } from "@/store/use-notification-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { requestBrowserPermission, getFcmToken } from "@/lib/firebase/client";
 import toast from "react-hot-toast";
@@ -31,7 +31,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
   const [permissionStatus, setPermissionStatus] = useState<string>("granted");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const { notifications, markAsRead, markAllAsRead, clearAll } = useNotificationStore();
 
@@ -43,11 +43,46 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
 
   const unreadCount = userNotifications.filter((n) => !n.read).length;
 
+  // Sync notifications from server API (/api/notifications)
+  const fetchServerNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.notifications)) {
+        interface ServerNotification {
+          id: string;
+          title: string;
+          body: string;
+          createdAt: string;
+          readStatus: boolean;
+          bookingId?: string;
+          role: "ADMIN" | "CUSTOMER";
+        }
+        data.notifications.forEach((sn: ServerNotification) => {
+          const exists = useNotificationStore.getState().notifications.some((n) => n.id === sn.id);
+          if (!exists) {
+            useNotificationStore.getState().addNotification({
+              title: sn.title,
+              body: sn.body,
+              url: sn.role === "ADMIN" ? "/admin/bookings" : "/dashboard",
+              bookingId: sn.bookingId,
+              role: sn.role,
+            });
+          }
+        });
+      }
+    } catch {
+      // Ignore offline sync warning
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       setPermissionStatus(Notification.permission);
     }
-  }, []);
+    fetchServerNotifications();
+  }, [fetchServerNotifications]);
 
   const handleEnablePush = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -79,17 +114,34 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
 
   const handleItemClick = (id: string, url?: string) => {
     markAsRead(id);
+    fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notificationId: id }),
+    }).catch(() => {});
     setIsOpen(false);
     if (url) {
       router.push(url);
     }
   };
 
+  const handleMarkAllRead = () => {
+    markAllAsRead();
+    fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ markAll: true }),
+    }).catch(() => {});
+  };
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       {/* Bell Trigger Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (!isOpen) fetchServerNotifications();
+        }}
         className={`relative p-2.5 rounded-full transition-all duration-200 flex items-center justify-center min-w-[40px] min-h-[40px] ${
           variant === "dark"
             ? "bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700"
@@ -134,7 +186,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
-                    onClick={markAllAsRead}
+                    onClick={handleMarkAllRead}
                     className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 font-semibold flex items-center gap-1 hover:underline"
                     title="Mark all as read"
                   >
@@ -187,7 +239,7 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
                   <p className="text-[11px] text-slate-400 mt-1">Updates regarding your bookings will appear here.</p>
                 </div>
               ) : (
-                userNotifications.map((item) => (
+                userNotifications.map((item: AppNotification) => (
                   <div
                     key={item.id}
                     onClick={() => handleItemClick(item.id, item.url)}

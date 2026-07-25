@@ -2,12 +2,12 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, Messaging, MessagePayload } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyArtiaircon96905ClientApiKeyFallback",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyCkejax3n4jg1MToXieMp2mQwVLjRshGbQ",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "artiaircon-96905.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "artiaircon-96905",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "artiaircon-96905.appspot.com",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "103829534695513028182",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:103829534695513028182:web:artiaircon96905app",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:538851500118:web:ef2a44578c2edc63cc9bf7",
 };
 
 let firebaseApp: FirebaseApp | null = null;

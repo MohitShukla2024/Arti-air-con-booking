@@ -22,17 +22,18 @@ enum BookingStatus {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  fullName     String
-  mobileNumber String    @unique
-  email        String?   @unique
-  role         Role      @default(CUSTOMER)
-  languagePref String    @default("en")
-  passwordHash String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  bookings     Booking[]
-  fcmTokens    FcmToken[]
+  id            String         @id @default(uuid())
+  fullName      String
+  mobileNumber  String         @unique
+  email         String?        @unique
+  role          Role           @default(CUSTOMER)
+  languagePref  String         @default("en")
+  passwordHash  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  bookings      Booking[]
+  fcmTokens     FcmToken[]
+  notifications Notification[]
 }
 
 model FcmToken {
@@ -47,11 +48,30 @@ model FcmToken {
   @@index([userId])
 }
 
+model Notification {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookingId  String?
+  booking    Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  role       Role
+  title      String
+  body       String
+  type       String   @default("SYSTEM")
+  readStatus Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([role, createdAt])
+  @@index([bookingId])
+}
+
 model Booking {
-  id                 String        @id @default(uuid())
-  bookingCode        String        @unique
+  id                 String         @id @default(uuid())
+  bookingCode        String         @unique
   customerId         String?
-  customer           User?         @relation(fields: [customerId], references: [id])
+  customer           User?          @relation(fields: [customerId], references: [id])
   fullName           String
   email              String?
   mobileNumber       String
@@ -64,10 +84,11 @@ model Booking {
   acBrand            String
   problemDescription String?
   preferredDateTime  DateTime
-  status             BookingStatus @default(PENDING)
-  amount             Float         @default(0.0)
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  status             BookingStatus  @default(PENDING)
+  amount             Float          @default(0.0)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  notifications      Notification[]
 
   @@index([customerId, createdAt])
   @@index([status, createdAt])
