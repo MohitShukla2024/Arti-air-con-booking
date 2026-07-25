@@ -11,6 +11,7 @@ import { useSettingsStore } from "@/store/use-settings-store";
 import { useLanguageStore } from "@/store/use-language-store";
 import { TRANSLATIONS } from "@/lib/translations";
 import { Globe } from "lucide-react";
+import { NotificationBellDropdown } from "@/components/notifications/notification-bell-dropdown";
 
 export interface HeaderNavbarProps {
   variant?: "public" | "customer" | "admin";
@@ -22,6 +23,12 @@ export function HeaderNavbar({ variant = "public" }: HeaderNavbarProps = {}) {
   const { brandName, phone, emergencyPhone } = useSettingsStore();
   const { language, setLanguage } = useLanguageStore();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/login");
+    router.refresh();
+  };
 
   // Auth-aware booking navigation
   const handleBookNav = () => {
@@ -124,6 +131,7 @@ export function HeaderNavbar({ variant = "public" }: HeaderNavbarProps = {}) {
         <div className="flex items-center gap-2 sm:gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-2 sm:gap-3">
+              <NotificationBellDropdown variant="light" />
               <Link
                 href="/dashboard"
                 className="flex items-center gap-1.5 bg-white border border-[#0050cb] text-[#0050cb] px-3 sm:px-4 py-2 rounded-full text-xs font-bold hover:bg-[#dae1ff]/20 transition-all min-h-[40px]"
@@ -131,7 +139,7 @@ export function HeaderNavbar({ variant = "public" }: HeaderNavbarProps = {}) {
                 <User className="w-4 h-4" /> <span>{t.navDashboard}</span>
               </Link>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="text-xs font-semibold text-[#ba1a1a] hover:underline hidden sm:inline px-2 py-1"
               >
                 Logout

@@ -6,6 +6,8 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 import { handleServerError } from "@/lib/error-handler";
 
+import { sendFcmNotificationToRole } from "@/lib/notifications/fcm-server";
+
 async function cancelBooking(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -45,6 +47,16 @@ async function cancelBooking(
             inMemItem.updatedAt = new Date().toISOString();
           }
 
+          // If customer cancelled, notify admins
+          if (currentUser.role !== "ADMIN") {
+            sendFcmNotificationToRole("ADMIN", {
+              title: "Booking Cancelled",
+              body: `Booking ${existing.bookingCode || id} was cancelled by the customer.`,
+              url: "/admin/bookings",
+              bookingId: updated.id,
+            }).catch((err) => console.error("[Cancel Booking] Admin FCM error:", err));
+          }
+
           return NextResponse.json({
             success: true,
             bookingId: updated.id,
@@ -60,6 +72,15 @@ async function cancelBooking(
     if (inMemItem) {
       inMemItem.status = "CANCELLED";
       inMemItem.updatedAt = new Date().toISOString();
+    }
+
+    if (currentUser.role !== "ADMIN") {
+      sendFcmNotificationToRole("ADMIN", {
+        title: "Booking Cancelled",
+        body: `Booking ${inMemItem?.bookingCode || id} was cancelled by the customer.`,
+        url: "/admin/bookings",
+        bookingId: id,
+      }).catch((err) => console.error("[Cancel Booking] Admin FCM memory error:", err));
     }
 
     // Fallback if DB is offline

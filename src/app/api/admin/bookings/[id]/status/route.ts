@@ -5,6 +5,43 @@ import { inMemoryBookings } from "@/app/api/bookings/route";
 import { forbiddenResponse, getRequestUser, unauthorizedResponse } from "@/lib/request-auth";
 import { handleServerError } from "@/lib/error-handler";
 
+import { sendFcmNotificationToUser } from "@/lib/notifications/fcm-server";
+
+function buildNotificationPayload(status: string, bookingCode: string) {
+  switch (status) {
+    case "ACCEPTED":
+      return {
+        title: "Booking Accepted",
+        body: `Your booking ${bookingCode} has been accepted.`,
+      };
+    case "COMPLETED":
+      return {
+        title: "Booking Completed",
+        body: "Your AC service has been completed successfully.",
+      };
+    case "CANCELLED":
+      return {
+        title: "Booking Cancelled",
+        body: `Your booking ${bookingCode} has been cancelled.`,
+      };
+    case "EN_ROUTE":
+      return {
+        title: "Technician En Route",
+        body: `Your technician is on the way for booking ${bookingCode}.`,
+      };
+    case "IN_PROGRESS":
+      return {
+        title: "Service In Progress",
+        body: `Work has started on your booking ${bookingCode}.`,
+      };
+    default:
+      return {
+        title: "Booking Status Update",
+        body: `Your booking ${bookingCode} status has been updated to ${status}.`,
+      };
+  }
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -27,11 +64,16 @@ export async function PATCH(
       );
     }
 
+    let customerId: string | null = null;
+    let bookingCode: string = id;
+
     // Mutate in-memory store so both Customer & Admin dashboards see the updated status
     const inMemItem = inMemoryBookings.find((b) => b.id === id || b.bookingCode === id);
     if (inMemItem) {
       inMemItem.status = status;
       inMemItem.updatedAt = new Date().toISOString();
+      customerId = inMemItem.customerId;
+      bookingCode = inMemItem.bookingCode;
     }
 
     const db = getPrisma();
@@ -41,10 +83,32 @@ export async function PATCH(
           where: { id },
           data: { status: status as BookingStatus },
         });
+        
+        customerId = updated.customerId || customerId;
+        bookingCode = updated.bookingCode || bookingCode;
+
+        if (customerId) {
+          const payload = buildNotificationPayload(status, bookingCode);
+          sendFcmNotificationToUser(customerId, {
+            ...payload,
+            url: "/dashboard",
+            bookingId: updated.id,
+          }).catch((err) => console.error("[PATCH status] FCM error:", err));
+        }
+
         return NextResponse.json({ success: true, booking: updated });
       } catch {
         // Ignore DB offline fallback
       }
+    }
+
+    if (customerId) {
+      const payload = buildNotificationPayload(status, bookingCode);
+      sendFcmNotificationToUser(customerId, {
+        ...payload,
+        url: "/dashboard",
+        bookingId: id,
+      }).catch((err) => console.error("[PATCH status] FCM memory error:", err));
     }
 
     return NextResponse.json({

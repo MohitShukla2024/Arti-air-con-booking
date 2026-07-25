@@ -5,6 +5,7 @@ import { getRequestUser, unauthorizedResponse } from "@/lib/request-auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 import { handleServerError } from "@/lib/error-handler";
+import { sendFcmNotificationToRole } from "@/lib/notifications/fcm-server";
 
 // In-memory fallback (dev/offline only — not reliable in serverless production)
 export const inMemoryBookings: {
@@ -142,6 +143,14 @@ export async function POST(request: Request) {
           },
         });
 
+        // Trigger real-time FCM notification to all Admins
+        sendFcmNotificationToRole("ADMIN", {
+          title: "New Booking Received",
+          body: `Customer ${parsed.data.fullName} booked ${parsed.data.serviceType}.`,
+          url: "/admin/bookings",
+          bookingId: createdBooking.id,
+        }).catch((err) => console.error("[POST /api/bookings] Admin FCM notification error:", err));
+
         return NextResponse.json({
           success: true,
           bookingCode: createdBooking.bookingCode,
@@ -178,6 +187,14 @@ export async function POST(request: Request) {
       updatedAt: new Date().toISOString(),
     };
     inMemoryBookings.unshift(newBookingObj);
+
+    // Trigger real-time FCM notification to all Admins (in-memory mode)
+    sendFcmNotificationToRole("ADMIN", {
+      title: "New Booking Received",
+      body: `Customer ${parsed.data.fullName} booked ${parsed.data.serviceType}.`,
+      url: "/admin/bookings",
+      bookingId: newBookingObj.id,
+    }).catch((err) => console.error("[POST /api/bookings] Admin FCM notification error:", err));
 
     return NextResponse.json({
       success: true,

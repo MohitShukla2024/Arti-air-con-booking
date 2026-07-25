@@ -4,6 +4,8 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { AuthHydrator } from "@/components/shared/auth-hydrator";
 import { SettingsHydrator } from "@/components/shared/settings-hydrator";
+import { NotificationPermissionModal } from "@/components/notifications/notification-permission-modal";
+import { NotificationListener } from "@/components/notifications/notification-listener";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -52,6 +54,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#f7f9fb] font-sans text-[#191c1e] flex flex-col selection:bg-[#0066ff] selection:text-white">
         <AuthHydrator />
         <SettingsHydrator />
+        <NotificationListener />
+        <NotificationPermissionModal />
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         {children}
       </body>

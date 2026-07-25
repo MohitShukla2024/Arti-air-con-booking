@@ -20,18 +20,16 @@ export const NAV_LINKS = [
 ];
 
 export const SERVICES_LIST = [
-  { id: "split-ac", icon: "Snowflake", title: "Split AC Service", price: "Starting at ₹450", description: "High-pressure jet pump cleaning for coil dirt removal & 30% faster cooling." },
-  { id: "window-ac", icon: "AppWindow", title: "Window AC Service", price: "Starting at ₹450", description: "Deep foam jet wash, drain pipe unclogging & deodorizing for fresh airflow." },
-  { id: "commercial-ac", icon: "Building2", title: "Commercial AC", price: "Custom Quote", description: "Bulk Cassette & Ductable HVAC maintenance for offices, restaurants & retail." },
-  { id: "ac-installation", icon: "Wrench", title: "AC Installation", price: "Starting at ₹1,200", description: "Precision wall mounting, copper piping setup & gas leak testing guarantee." },
-  { id: "gas-filling", icon: "Gauge", title: "Gas Filling", price: "Starting at ₹1,200", description: "100% pure R32 / R410a refrigerant top-up with pressure gauge verification." },
-  { id: "deep-cleaning", icon: "Sparkles", title: "Deep Cleaning", price: "Starting at ₹599", description: "Anti-bacterial chemical jet wash removing 99.9% dust & mold build-up." },
-  { id: "pcb-repair", icon: "Cpu", title: "PCB Repair", price: "Starting at ₹850", description: "Inverter AC circuit board micro-soldering & error code diagnostic repair." },
-  { id: "leakage-repair", icon: "Droplets", title: "Leakage Repair", price: "Starting at ₹399", description: "Indoor water dripping fix, insulation wrapping & tray drain line sealing." },
-  { id: "performance-check", icon: "Activity", title: "Performance Check", price: "Starting at ₹299", description: "Complete 21-point thermal inspection, voltage testing & health report." },
-  { id: "condenser-repair", icon: "Fan", title: "Condenser Repair", price: "Starting at ₹750", description: "Outdoor unit fin straightening, fan coil repair & heat exchange restore." },
-  { id: "fan-motor-repair", icon: "Settings", title: "Fan Motor Repair", price: "Starting at ₹650", description: "Blower motor bearing lubrication, capacitor replacement & noise elimination." },
-  { id: "uninstallation", icon: "Archive", title: "Uninstallation", price: "Starting at ₹599", description: "Safe refrigerant lock-in, pipe disconnection & damage-free wall removal." },
+  { id: "window-ac", icon: "AppWindow", title: "Window AC Service", price: "Starting at ₹400", description: "Deep foam jet wash, drain pipe unclogging & deodorizing for fresh airflow." },
+  { id: "ac-uninstallation", icon: "Archive", title: "AC Uninstallation", price: "Starting at ₹600", description: "Safe refrigerant lock-in, pipe disconnection & damage-free wall removal." },
+  { id: "pcb-circuit-repair", icon: "Cpu", title: "PCB Circuit Repair", price: "", description: "Inverter AC circuit board micro-soldering & error code diagnostic repair." },
+  { id: "compressor-replacement", icon: "Settings", title: "Compressor Replacement", price: "", description: "Genuine sealed compressor motor replacement with vacuum pressure testing." },
+  { id: "fan-motor-repair", icon: "Fan", title: "Fan Motor Repair", price: "", description: "Blower motor bearing lubrication, capacitor replacement & noise elimination." },
+  { id: "capacitor-replacement", icon: "Zap", title: "Capacitor Replacement", price: "Starting at ₹950", description: "Heavy-duty dual run capacitor replacement for instant compressor start." },
+  { id: "annual-amc-package", icon: "ShieldCheck", title: "Annual AMC Package (Full Year)", price: "Starting at ₹1,300", description: "Full annual coverage, unlimited breakdown calls & free maintenance services." },
+  { id: "vrv-ac-service", icon: "Building2", title: "VRV AC Service", price: "Starting at ₹1,300 / AC", description: "Advanced Variable Refrigerant Volume HVAC system servicing & diagnostic." },
+  { id: "commercial-services", icon: "Building", title: "Commercial Services", price: "Starting at ₹1,250", description: "Bulk Cassette & Ductable HVAC maintenance for offices, restaurants & retail." },
+  { id: "tower-ac-service", icon: "Server", title: "Tower AC Service", price: "Starting at ₹1,250", description: "Floor standing Tower AC deep jet wash, filter cleaning & air throw restoration." },
 ];
 
 export const PRICING_PLANS = [
@@ -145,12 +143,16 @@ export const FAQ_LIST = [
 ];
 
 export const SERVICE_OPTIONS = [
-  "Jet Cleaning",
-  "Gas Refill",
-  "Installation",
-  "Full Repair",
-  "Annual AMC Contract",
-  "Corporate Bulk Servicing",
+  "Window AC Service",
+  "AC Uninstallation",
+  "PCB Circuit Repair",
+  "Compressor Replacement",
+  "Fan Motor Repair",
+  "Capacitor Replacement",
+  "Annual AMC Package (Full Year)",
+  "VRV AC Service",
+  "Commercial Services",
+  "Tower AC Service",
 ];
 export const AC_TYPE_OPTIONS = ["Split AC", "Window AC", "Cassette AC", "Tower AC", "Ductable HVAC"];
 export const AC_BRAND_OPTIONS = ["Daikin", "Voltas", "LG", "Samsung", "Blue Star", "Carrier", "Other"];

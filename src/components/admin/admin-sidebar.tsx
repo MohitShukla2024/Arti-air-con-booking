@@ -40,10 +40,11 @@ export function AdminSidebar({
   const router = useRouter();
   const { logoutAdmin } = useAuthStore();
 
-  const handleLogout = () => {
-    logoutAdmin();
+  const handleLogout = async () => {
+    await logoutAdmin();
     toast.success("Admin logged out successfully");
     router.replace("/admin/login");
+    router.refresh();
   };
 
   const handleNavClick = (tabId: AdminTabType) => {

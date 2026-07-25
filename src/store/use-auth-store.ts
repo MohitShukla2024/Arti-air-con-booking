@@ -10,8 +10,8 @@ interface AuthState {
   loginAdmin: (admin: UserProfile) => void;
   setSessionUser: (user: UserProfile | null) => void;
   updateUserProfile: (data: Partial<UserProfile>) => void;
-  logout: () => void;
-  logoutAdmin: () => void;
+  logout: () => Promise<void>;
+  logoutAdmin: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -46,18 +46,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     set((state) => ({
       user: state.user ? { ...state.user, ...data } : null,
     })),
-  logout: () =>
+  logout: async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("[AuthStore] Logout fetch error:", err);
+    }
     set({
       user: null,
       isAuthenticated: false,
       isAdmin: false,
       isHydrated: true,
-    }),
-  logoutAdmin: () =>
+    });
+  },
+  logoutAdmin: async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("[AuthStore] Admin logout fetch error:", err);
+    }
     set({
       user: null,
       isAuthenticated: false,
       isAdmin: false,
       isHydrated: true,
-    }),
+    });
+  },
 }));

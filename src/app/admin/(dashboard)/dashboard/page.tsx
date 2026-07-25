@@ -31,6 +31,8 @@ import {
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useSettingsStore } from "@/store/use-settings-store";
+import { useNotificationStore } from "@/store/use-notification-store";
+import { NotificationBellDropdown } from "@/components/notifications/notification-bell-dropdown";
 import { AdminSidebar, AdminTabType } from "@/components/admin/admin-sidebar";
 
 interface AdminBookingRow {
@@ -231,6 +233,13 @@ function AdminDashboardContent() {
       });
     } catch {}
 
+    useNotificationStore.getState().addNotification({
+      title: "Booking Accepted",
+      body: `Booking ${code} has been ACCEPTED and assigned to Technician Nitesh.`,
+      url: "/admin/dashboard",
+      bookingId: id,
+    });
+
     setBookings((prev) =>
       prev.map((b) => (b.id === id ? { ...b, status: "ACCEPTED" as const, technicianAssigned: "Nitesh Kumar Sharma" } : b))
     );
@@ -246,6 +255,13 @@ function AdminDashboardContent() {
       });
     } catch {}
 
+    useNotificationStore.getState().addNotification({
+      title: "Booking Cancelled",
+      body: `Booking ${code} has been CANCELLED by Admin.`,
+      url: "/admin/dashboard",
+      bookingId: id,
+    });
+
     setBookings((prev) =>
       prev.map((b) => (b.id === id ? { ...b, status: "CANCELLED" as const } : b))
     );
@@ -260,6 +276,13 @@ function AdminDashboardContent() {
         body: JSON.stringify({ status: "COMPLETED" }),
       });
     } catch {}
+
+    useNotificationStore.getState().addNotification({
+      title: "Booking Completed",
+      body: `Booking ${code} has been marked COMPLETED.`,
+      url: "/admin/dashboard",
+      bookingId: id,
+    });
 
     setBookings((prev) =>
       prev.map((b) => (b.id === id ? { ...b, status: "COMPLETED" as const } : b))
@@ -451,12 +474,7 @@ function AdminDashboardContent() {
             </div>
 
             {/* Notification Bell */}
-            <button
-              onClick={() => toast("No new system notifications.")}
-              className="w-9 h-9 rounded-full bg-[#f0f4f9] flex items-center justify-center text-[#555f6c] hover:bg-[#e0e8f5] transition-colors"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
+            <NotificationBellDropdown variant="light" />
 
             {/* User Profile Avatar (Icon Badge - No Profile Image) */}
             <div className="w-9 h-9 rounded-full bg-[#0066ff] text-white flex items-center justify-center shadow-sm">

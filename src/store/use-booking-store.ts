@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { ServiceBooking } from "@/types";
+import { useNotificationStore } from "@/store/use-notification-store";
 
 interface BookingStoreState {
   activeBooking: ServiceBooking | null;
@@ -24,13 +25,28 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
 
   setActiveBooking: (booking) => set({ activeBooking: booking }),
 
-  addBooking: (booking) =>
+  addBooking: (booking) => {
+    useNotificationStore.getState().addNotification({
+      title: "New Service Booking Placed!",
+      body: `Booking #${booking.bookingCode || booking.id} for ${booking.serviceType} on ${booking.preferredDateTime} has been confirmed.`,
+      url: "/dashboard",
+      bookingId: booking.id,
+    });
+
     set((state) => ({
       activeBooking: booking,
       bookingHistory: [booking, ...state.bookingHistory],
-    })),
+    }));
+  },
 
-  cancelBooking: (bookingId) =>
+  cancelBooking: (bookingId) => {
+    useNotificationStore.getState().addNotification({
+      title: "Booking Cancelled",
+      body: `Booking #${bookingId} was successfully cancelled.`,
+      url: "/dashboard",
+      bookingId,
+    });
+
     set((state) => ({
       activeBooking:
         state.activeBooking?.id === bookingId
@@ -39,7 +55,8 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
       bookingHistory: state.bookingHistory.map((b) =>
         b.id === bookingId ? { ...b, status: "CANCELLED" } : b
       ),
-    })),
+    }));
+  },
 
   setBookingHistory: (history) => set({ bookingHistory: history }),
 }));

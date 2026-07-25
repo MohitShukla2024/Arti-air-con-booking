@@ -8,6 +8,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 
 import { handleServerError } from "@/lib/error-handler";
+import { sendFcmNotificationToRole } from "@/lib/notifications/fcm-server";
 
 function normalizeMobile(value: string) {
   return value.replace(/[\s-]/g, "");
@@ -70,6 +71,13 @@ export async function POST(request: Request) {
       email: user.email || null,
       role: user.role as "ADMIN" | "CUSTOMER",
     };
+
+    // Notify admins of new customer signup
+    sendFcmNotificationToRole("ADMIN", {
+      title: "New Customer Registered",
+      body: `${user.fullName} registered an account.`,
+      url: "/admin/bookings",
+    }).catch((err) => console.error("[Signup] Admin FCM error:", err));
 
     const response = NextResponse.json(
       {

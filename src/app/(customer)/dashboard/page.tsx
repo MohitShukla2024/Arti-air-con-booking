@@ -277,10 +277,11 @@ export default function CustomerDashboardPage() {
   }, [fetchLiveDashboardData, currentActiveBooking?.status]);
 
   // Logout Handler
-  const handleCustomerLogout = () => {
-    logout();
+  const handleCustomerLogout = async () => {
+    await logout();
     toast.success("Logged out successfully");
     router.replace("/login");
+    router.refresh();
   };
 
   // Handle Dynamic Cancellation
