@@ -48,9 +48,9 @@ function initFirebaseAdmin(): App | null {
   try {
     return initializeApp({
       credential: cert({
-        projectId,
-        clientEmail,
-        privateKey,
+        projectId: projectId!,
+        clientEmail: clientEmail!,
+        privateKey: privateKey!,
       }),
     });
   } catch (error) {
@@ -64,10 +64,11 @@ function initFirebaseAdmin(): App | null {
  */
 async function removeInvalidToken(token: string) {
   removeInMemoryFcmToken(token);
-  const prisma = getPrisma();
-  if (prisma) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getPrisma() as any;
+  if (db && db.fcmToken) {
     try {
-      await prisma.fcmToken.deleteMany({ where: { token } });
+      await db.fcmToken.deleteMany({ where: { token } });
     } catch {
       // Ignore DB error during invalid token deletion
     }
@@ -82,10 +83,11 @@ export async function sendFcmNotificationToUser(
   payload: NotificationPayload
 ): Promise<{ successCount: number; failureCount: number }> {
   // 1. Persist Notification record in Database
-  const prisma = getPrisma();
-  if (prisma) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getPrisma() as any;
+  if (db && db.notification) {
     try {
-      await prisma.notification.create({
+      await db.notification.create({
         data: {
           userId,
           bookingId: payload.bookingId || null,
@@ -103,13 +105,14 @@ export async function sendFcmNotificationToUser(
 
   // 2. Resolve FCM Device Tokens
   const tokensSet = new Set<string>();
-  if (prisma) {
+  if (db && db.fcmToken) {
     try {
-      const dbTokens = await prisma.fcmToken.findMany({
+      const dbTokens = await db.fcmToken.findMany({
         where: { userId },
         select: { token: true },
       });
-      dbTokens.forEach((t) => tokensSet.add(t.token));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dbTokens.forEach((t: any) => tokensSet.add(t.token));
     } catch (err) {
       console.error(`[FCM Server] Error fetching tokens for user ${userId} from DB:`, err);
     }
@@ -156,7 +159,20 @@ export async function sendFcmNotificationToUser(
       timestamp: new Date().toISOString(),
       ...(payload.data || {}),
     },
+    android: {
+      priority: "high",
+      notification: {
+        sound: "default",
+        defaultSound: true,
+        defaultVibrateTimings: true,
+        priority: "high",
+      },
+    },
     webpush: {
+      headers: {
+        Urgency: "high",
+        TTL: "86400",
+      },
       fcmOptions: {
         link: targetUrl,
       },
@@ -165,7 +181,7 @@ export async function sendFcmNotificationToUser(
         body: payload.body,
         icon: iconUrl,
         badge: iconUrl,
-        vibrate: [200, 100, 200, 100, 200],
+        vibrate: [200, 100, 200, 100, 200] as unknown as number[],
         requireInteraction: true,
         renotify: true,
         tag: payload.bookingId || `arti-user-push-${Date.now()}`,
@@ -179,7 +195,7 @@ export async function sendFcmNotificationToUser(
     // Prune invalid / expired tokens
     response.responses.forEach((resp: SendResponse, idx: number) => {
       if (!resp.success && resp.error) {
-        const errCode = resp.error.code;
+        const errCode = resp.error?.code || (resp.error as { code?: string })?.code;
         if (
           errCode === "messaging/registration-token-not-registered" ||
           errCode === "messaging/invalid-registration-token"
@@ -208,10 +224,11 @@ export async function sendFcmNotificationToRole(
   payload: NotificationPayload
 ): Promise<{ successCount: number; failureCount: number }> {
   // 1. Persist Notification record in Database
-  const prisma = getPrisma();
-  if (prisma) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getPrisma() as any;
+  if (db && db.notification) {
     try {
-      await prisma.notification.create({
+      await db.notification.create({
         data: {
           role: role as Role,
           bookingId: payload.bookingId || null,
@@ -228,13 +245,14 @@ export async function sendFcmNotificationToRole(
 
   // 2. Resolve FCM Device Tokens
   const tokensSet = new Set<string>();
-  if (prisma) {
+  if (db && db.fcmToken) {
     try {
-      const dbTokens = await prisma.fcmToken.findMany({
+      const dbTokens = await db.fcmToken.findMany({
         where: { user: { role: role as Role } },
         select: { token: true },
       });
-      dbTokens.forEach((t) => tokensSet.add(t.token));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dbTokens.forEach((t: any) => tokensSet.add(t.token));
     } catch (err) {
       console.error(`[FCM Server] Error fetching tokens for role ${role} from DB:`, err);
     }
@@ -287,7 +305,20 @@ export async function sendFcmNotificationToRole(
       timestamp: new Date().toISOString(),
       ...(payload.data || {}),
     },
+    android: {
+      priority: "high",
+      notification: {
+        sound: "default",
+        defaultSound: true,
+        defaultVibrateTimings: true,
+        priority: "high",
+      },
+    },
     webpush: {
+      headers: {
+        Urgency: "high",
+        TTL: "86400",
+      },
       fcmOptions: {
         link: targetUrl,
       },
@@ -296,7 +327,7 @@ export async function sendFcmNotificationToRole(
         body: payload.body,
         icon: iconUrl,
         badge: iconUrl,
-        vibrate: [200, 100, 200, 100, 200],
+        vibrate: [200, 100, 200, 100, 200] as unknown as number[],
         requireInteraction: true,
         renotify: true,
         tag: payload.bookingId || `arti-role-push-${Date.now()}`,
@@ -309,7 +340,7 @@ export async function sendFcmNotificationToRole(
 
     response.responses.forEach((resp: SendResponse, idx: number) => {
       if (!resp.success && resp.error) {
-        const errCode = resp.error.code;
+        const errCode = resp.error?.code || (resp.error as { code?: string })?.code;
         if (
           errCode === "messaging/registration-token-not-registered" ||
           errCode === "messaging/invalid-registration-token"
