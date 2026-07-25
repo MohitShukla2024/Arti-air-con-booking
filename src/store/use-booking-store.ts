@@ -28,19 +28,10 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
   addBooking: (booking) => {
     const code = booking.bookingCode || booking.id;
 
-    // 1. Notification targeted for CUSTOMER
-    useNotificationStore.getState().addNotification({
-      title: "Booking Submitted Successfully 📝",
-      body: `Your booking #${code} for ${booking.serviceType} has been received. Our team will assign a technician shortly.`,
-      url: "/dashboard",
-      bookingId: booking.id,
-      role: "CUSTOMER",
-    });
-
-    // 2. Notification targeted for ADMIN
+    // Notification targeted strictly for ADMIN (New Booking Created alert)
     useNotificationStore.getState().addNotification({
       title: "New Booking Received! 🚨",
-      body: `New booking #${code} placed by ${booking.fullName || "Customer"} (${booking.mobileNumber || ""}) for ${booking.serviceType}. Needs technician assignment.`,
+      body: `New booking ${code} placed by ${booking.fullName || "Customer"} (${booking.mobileNumber || ""}) for ${booking.serviceType}. Needs technician assignment.`,
       url: "/admin/dashboard?tab=bookings",
       bookingId: booking.id,
       role: "ADMIN",
@@ -53,16 +44,7 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
   },
 
   cancelBooking: (bookingId) => {
-    // 1. Notification targeted for CUSTOMER
-    useNotificationStore.getState().addNotification({
-      title: "Booking Cancelled ❌",
-      body: `Your booking #${bookingId} was successfully cancelled.`,
-      url: "/dashboard",
-      bookingId,
-      role: "CUSTOMER",
-    });
-
-    // 2. Notification targeted for ADMIN
+    // Notification targeted strictly for ADMIN (Customer Cancellation alert)
     useNotificationStore.getState().addNotification({
       title: "Booking Cancelled by Customer ⚠️",
       body: `Customer cancelled booking #${bookingId}.`,

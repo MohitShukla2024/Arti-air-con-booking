@@ -5,8 +5,7 @@ import { forbiddenResponse, getRequestUser, unauthorizedResponse } from "@/lib/r
 import { checkRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 import { handleServerError } from "@/lib/error-handler";
-
-import { sendFcmNotificationToRole } from "@/lib/notifications/fcm-server";
+import { sendFcmNotificationToRole, sendFcmNotificationToUser } from "@/lib/notifications/fcm-server";
 
 async function cancelBooking(
   request: Request,
@@ -28,32 +27,53 @@ async function cancelBooking(
       return forbiddenResponse();
     }
 
+    let targetCustomerId: string | null = inMemItem?.customerId || null;
+    let targetBookingCode: string = inMemItem?.bookingCode || id;
+
     const prisma = getPrisma();
     if (prisma) {
       try {
-        const existing = await prisma.booking.findUnique({ where: { id } });
+        const existing = await prisma.booking.findFirst({
+          where: {
+            OR: [{ id }, { bookingCode: id }],
+          },
+        });
+
         if (existing) {
           if (currentUser.role !== "ADMIN" && existing.customerId && existing.customerId !== currentUser.id) {
             return forbiddenResponse();
           }
 
           const updated = await prisma.booking.update({
-            where: { id },
+            where: { id: existing.id },
             data: { status: "CANCELLED" },
           });
+
+          targetCustomerId = updated.customerId || existing.customerId || targetCustomerId;
+          targetBookingCode = updated.bookingCode || existing.bookingCode || targetBookingCode;
 
           if (inMemItem) {
             inMemItem.status = "CANCELLED";
             inMemItem.updatedAt = new Date().toISOString();
           }
 
-          // If customer cancelled, notify admins
-          if (currentUser.role !== "ADMIN") {
+          if (currentUser.role === "ADMIN" && targetCustomerId) {
+            // Notify Customer that Admin cancelled their booking
+            sendFcmNotificationToUser(targetCustomerId, {
+              title: "Booking Cancelled ❌",
+              body: `Your booking ${targetBookingCode} has been cancelled by admin.`,
+              url: "/dashboard",
+              bookingId: updated.id,
+              role: "CUSTOMER",
+            }).catch((err) => console.error("[Cancel Booking] Customer FCM error:", err));
+          } else if (currentUser.role !== "ADMIN") {
+            // Notify Admins that Customer cancelled their booking
             sendFcmNotificationToRole("ADMIN", {
-              title: "Booking Cancelled",
-              body: `Booking ${existing.bookingCode || id} was cancelled by the customer.`,
+              title: "Booking Cancelled by Customer ⚠️",
+              body: `Booking ${targetBookingCode} was cancelled by the customer.`,
               url: "/admin/bookings",
               bookingId: updated.id,
+              role: "ADMIN",
             }).catch((err) => console.error("[Cancel Booking] Admin FCM error:", err));
           }
 
@@ -61,7 +81,7 @@ async function cancelBooking(
             success: true,
             bookingId: updated.id,
             status: updated.status,
-            message: `Booking ${id} cancelled successfully`,
+            message: `Booking ${targetBookingCode} cancelled successfully`,
           });
         }
       } catch (dbError) {
@@ -74,21 +94,29 @@ async function cancelBooking(
       inMemItem.updatedAt = new Date().toISOString();
     }
 
-    if (currentUser.role !== "ADMIN") {
+    if (currentUser.role === "ADMIN" && targetCustomerId) {
+      sendFcmNotificationToUser(targetCustomerId, {
+        title: "Booking Cancelled ❌",
+        body: `Your booking ${targetBookingCode} has been cancelled by admin.`,
+        url: "/dashboard",
+        bookingId: id,
+        role: "CUSTOMER",
+      }).catch((err) => console.error("[Cancel Booking] Customer FCM memory error:", err));
+    } else if (currentUser.role !== "ADMIN") {
       sendFcmNotificationToRole("ADMIN", {
-        title: "Booking Cancelled",
-        body: `Booking ${inMemItem?.bookingCode || id} was cancelled by the customer.`,
+        title: "Booking Cancelled by Customer ⚠️",
+        body: `Booking ${targetBookingCode} was cancelled by the customer.`,
         url: "/admin/bookings",
         bookingId: id,
+        role: "ADMIN",
       }).catch((err) => console.error("[Cancel Booking] Admin FCM memory error:", err));
     }
 
-    // Fallback if DB is offline
     return NextResponse.json({
       success: true,
       bookingId: id,
       status: "CANCELLED",
-      message: `Booking ${id} cancelled (in-memory)`,
+      message: `Booking ${id} cancelled`,
     });
   } catch (error) {
     return handleServerError("POST /api/bookings/[id]/cancel", error, "Unable to cancel booking. Please try again.");
