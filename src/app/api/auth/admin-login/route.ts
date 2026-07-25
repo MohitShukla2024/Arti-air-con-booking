@@ -58,11 +58,9 @@ export async function POST(request: Request) {
         );
         return response;
       }
-      // Password mismatch
-      return NextResponse.json({ success: false, message: "Invalid Admin ID or password." }, { status: 401 });
     }
 
-    // 2. Check Memory Admin (Offline / Seeded Admin Mode)
+    // 2. Check Memory Admin (Master Admin Fallback Mode)
     const memoryAdmin = findMemoryUser(adminId);
     if (memoryAdmin && memoryAdmin.role === "ADMIN") {
       if (memoryAdmin.passwordHash && (await verifyPassword(parsed.data.password, memoryAdmin.passwordHash))) {

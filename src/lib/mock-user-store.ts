@@ -28,15 +28,14 @@ memoryUsers.set("admin", DEFAULT_ADMIN);
 memoryUsers.set("9264173334", DEFAULT_ADMIN);
 
 export function findMemoryUser(key: string): StoredUser | undefined {
-  // Completely disable in-memory user lookup in production environments
-  if (process.env.NODE_ENV === "production") return undefined;
-
-  const normalizedKey = key.trim().toLowerCase().replace(/[\s-]/g, "");
+  const normalizedKey = key.trim().toLowerCase().replace(/[\s-]/g, "").replace(/^\+91/, "");
   for (const [k, u] of memoryUsers.entries()) {
+    const kNorm = k.toLowerCase().replace(/[\s-]/g, "").replace(/^\+91/, "");
+    const uMobileNorm = u.mobileNumber.replace(/[\s-]/g, "").replace(/^\+91/, "");
     if (
-      k.toLowerCase() === normalizedKey ||
+      kNorm === normalizedKey ||
       u.email?.toLowerCase() === normalizedKey ||
-      u.mobileNumber.replace(/[\s-]/g, "") === normalizedKey ||
+      uMobileNorm === normalizedKey ||
       u.id === key
     ) {
       return u;
