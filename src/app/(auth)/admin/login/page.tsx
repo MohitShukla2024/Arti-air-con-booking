@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Snowflake, User, Lock, ArrowRight, Loader2, CheckCircle2, Shield, KeyRound, Mail, UserPlus, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
@@ -30,6 +30,13 @@ export default function AdminLoginPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-redirect if already logged in as ADMIN
+  useEffect(() => {
+    if (isHydrated && user?.role === "ADMIN") {
+      window.location.href = "/admin/dashboard";
+    }
+  }, [isHydrated, user]);
 
   // Handle Admin Login Submit
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -63,8 +70,8 @@ export default function AdminLoginPage() {
       toast.success("Admin authenticated! Opening Admin Hub...");
 
       setTimeout(() => {
-        router.replace("/admin/dashboard");
-      }, 1000);
+        window.location.href = "/admin/dashboard";
+      }, 500);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to authenticate admin.");
     } finally {
