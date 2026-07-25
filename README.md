@@ -119,9 +119,9 @@ arti-air-con/
 3. **Configure Environment Variables:**  
    Create a `.env` file in the root directory (refer to `.env.example`):
    ```env
-   DATABASE_URL="mysql://root:password@localhost:3306/arti_ac_con"
-   SESSION_SECRET="arti_prod_sec_key_9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a"
-   NEXTAUTH_SECRET="arti_nextauth_prod_key_1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f"
+   DATABASE_URL="mysql://username:password@localhost:3306/arti_ac_con"
+   SESSION_SECRET="your-at-least-32-character-session-secret-key"
+   NEXTAUTH_SECRET="your-at-least-32-character-nextauth-secret-key"
    ```
 
 4. **Sync Database Schema:**
