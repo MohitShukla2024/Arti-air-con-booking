@@ -118,6 +118,9 @@ export async function sendFcmNotificationToUser(userId: string, payload: Notific
 
   const messaging = getMessaging(app);
 
+  const iconUrl = payload.icon || "/icons/icon-192.png";
+  const targetUrl = payload.url || (payload.role === "ADMIN" ? "/admin/bookings" : "/dashboard");
+
   const message: MulticastMessage = {
     tokens: targetTokens,
     notification: {
@@ -127,19 +130,25 @@ export async function sendFcmNotificationToUser(userId: string, payload: Notific
     data: {
       title: payload.title,
       body: payload.body,
-      icon: payload.icon || "/hero-technician.png",
-      url: payload.url || (payload.role === "ADMIN" ? "/admin/bookings" : "/dashboard"),
+      icon: iconUrl,
+      url: targetUrl,
       bookingId: payload.bookingId || "",
       timestamp: new Date().toISOString(),
       ...(payload.data || {}),
     },
     webpush: {
       fcmOptions: {
-        link: payload.url || (payload.role === "ADMIN" ? "/admin/bookings" : "/dashboard"),
+        link: targetUrl,
       },
       notification: {
-        icon: payload.icon || "/hero-technician.png",
-        badge: "/hero-technician.png",
+        title: payload.title,
+        body: payload.body,
+        icon: iconUrl,
+        badge: iconUrl,
+        vibrate: [200, 100, 200, 100, 200],
+        requireInteraction: true,
+        renotify: true,
+        tag: payload.bookingId || `arti-user-push-${Date.now()}`,
       },
     },
   };
@@ -222,6 +231,9 @@ export async function sendFcmNotificationToRole(role: "ADMIN" | "CUSTOMER", payl
 
   const messaging = getMessaging(app);
 
+  const iconUrl = payload.icon || "/icons/icon-192.png";
+  const targetUrl = payload.url || (role === "ADMIN" ? "/admin/bookings" : "/dashboard");
+
   const message: MulticastMessage = {
     tokens: targetTokens,
     notification: {
@@ -231,15 +243,25 @@ export async function sendFcmNotificationToRole(role: "ADMIN" | "CUSTOMER", payl
     data: {
       title: payload.title,
       body: payload.body,
-      icon: payload.icon || "/hero-technician.png",
-      url: payload.url || (role === "ADMIN" ? "/admin/bookings" : "/dashboard"),
+      icon: iconUrl,
+      url: targetUrl,
       bookingId: payload.bookingId || "",
       timestamp: new Date().toISOString(),
       ...(payload.data || {}),
     },
     webpush: {
       fcmOptions: {
-        link: payload.url || (role === "ADMIN" ? "/admin/bookings" : "/dashboard"),
+        link: targetUrl,
+      },
+      notification: {
+        title: payload.title,
+        body: payload.body,
+        icon: iconUrl,
+        badge: iconUrl,
+        vibrate: [200, 100, 200, 100, 200],
+        requireInteraction: true,
+        renotify: true,
+        tag: payload.bookingId || `arti-role-push-${Date.now()}`,
       },
     },
   };

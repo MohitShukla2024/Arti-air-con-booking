@@ -40,7 +40,7 @@ export function NotificationListener() {
     let unsubscribe: (() => void) | null = null;
 
     onForegroundMessage((payload) => {
-      const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update";
+      const title = payload.notification?.title || payload.data?.title || "Arti Air Con Update 🔔";
       const body = payload.notification?.body || payload.data?.body || "You have a new update regarding your booking.";
       const targetUrl = payload.data?.url || (user?.role === "ADMIN" ? "/admin/bookings" : "/dashboard");
 
@@ -52,7 +52,36 @@ export function NotificationListener() {
         bookingId: payload.data?.bookingId,
       });
 
-      // Custom real-time toast
+      // 1. Native System OS Notification (Phone Notification Bar like WhatsApp / Instagram)
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+        try {
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.ready.then((registration) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const swOptions: any = {
+                body,
+                icon: "/icons/icon-192.png",
+                badge: "/icons/icon-192.png",
+                vibrate: [200, 100, 200, 100, 200],
+                tag: payload.data?.bookingId || `arti-push-${Date.now()}`,
+                renotify: true,
+                data: { url: targetUrl, bookingId: payload.data?.bookingId },
+              };
+              registration.showNotification(title, swOptions);
+            });
+          } else {
+            new Notification(title, {
+              body,
+              icon: "/icons/icon-192.png",
+              data: { url: targetUrl },
+            });
+          }
+        } catch (err) {
+          console.warn("[Notification Listener] Native OS notification error:", err);
+        }
+      }
+
+      // 2. Custom In-App Real-Time Toast
       toast.custom(
         (t) => (
           <div
