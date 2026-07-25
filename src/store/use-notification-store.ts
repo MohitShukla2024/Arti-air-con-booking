@@ -9,7 +9,7 @@ export interface AppNotification {
   read: boolean;
   url?: string;
   bookingId?: string;
-  role?: "ADMIN" | "CUSTOMER";
+  role?: "ADMIN" | "CUSTOMER" | "ALL";
 }
 
 interface NotificationState {

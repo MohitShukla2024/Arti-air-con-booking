@@ -26,11 +26,24 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
   setActiveBooking: (booking) => set({ activeBooking: booking }),
 
   addBooking: (booking) => {
+    const code = booking.bookingCode || booking.id;
+
+    // 1. Notification targeted for CUSTOMER
     useNotificationStore.getState().addNotification({
-      title: "New Service Booking Placed!",
-      body: `Booking #${booking.bookingCode || booking.id} for ${booking.serviceType} on ${booking.preferredDateTime} has been confirmed.`,
+      title: "Booking Submitted Successfully 📝",
+      body: `Your booking #${code} for ${booking.serviceType} has been received. Our team will assign a technician shortly.`,
       url: "/dashboard",
       bookingId: booking.id,
+      role: "CUSTOMER",
+    });
+
+    // 2. Notification targeted for ADMIN
+    useNotificationStore.getState().addNotification({
+      title: "New Booking Received! 🚨",
+      body: `New booking #${code} placed by ${booking.fullName || "Customer"} (${booking.mobileNumber || ""}) for ${booking.serviceType}. Needs technician assignment.`,
+      url: "/admin/dashboard?tab=bookings",
+      bookingId: booking.id,
+      role: "ADMIN",
     });
 
     set((state) => ({
@@ -40,11 +53,22 @@ export const useBookingStore = create<BookingStoreState>((set) => ({
   },
 
   cancelBooking: (bookingId) => {
+    // 1. Notification targeted for CUSTOMER
     useNotificationStore.getState().addNotification({
-      title: "Booking Cancelled",
-      body: `Booking #${bookingId} was successfully cancelled.`,
+      title: "Booking Cancelled ❌",
+      body: `Your booking #${bookingId} was successfully cancelled.`,
       url: "/dashboard",
       bookingId,
+      role: "CUSTOMER",
+    });
+
+    // 2. Notification targeted for ADMIN
+    useNotificationStore.getState().addNotification({
+      title: "Booking Cancelled by Customer ⚠️",
+      body: `Customer cancelled booking #${bookingId}.`,
+      url: "/admin/dashboard?tab=bookings",
+      bookingId,
+      role: "ADMIN",
     });
 
     set((state) => ({

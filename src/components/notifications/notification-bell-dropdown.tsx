@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, CheckCheck, Trash2, Calendar, ExternalLink, X } from "lucide-react";
 import { useNotificationStore } from "@/store/use-notification-store";
+import { useAuthStore } from "@/store/use-auth-store";
 import { requestBrowserPermission, getFcmToken } from "@/lib/firebase/client";
 import toast from "react-hot-toast";
 
@@ -30,9 +31,17 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
   const [permissionStatus, setPermissionStatus] = useState<string>("granted");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const { notifications, markAsRead, markAllAsRead, clearAll } = useNotificationStore();
-  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const currentUserRole = user?.role || "CUSTOMER";
+  const userNotifications = notifications.filter((n) => {
+    if (!n.role || n.role === "ALL") return true;
+    return n.role === currentUserRole;
+  });
+
+  const unreadCount = userNotifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -171,14 +180,14 @@ export function NotificationBellDropdown({ variant = "light" }: { variant?: "lig
 
             {/* List */}
             <div className="max-h-[65vh] sm:max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-              {notifications.length === 0 ? (
+              {userNotifications.length === 0 ? (
                 <div className="p-8 text-center text-slate-400">
                   <Bell className="w-8 h-8 mx-auto mb-2 opacity-30 stroke-1" />
                   <p className="text-xs font-medium">No notifications yet</p>
                   <p className="text-[11px] text-slate-400 mt-1">Updates regarding your bookings will appear here.</p>
                 </div>
               ) : (
-                notifications.map((item) => (
+                userNotifications.map((item) => (
                   <div
                     key={item.id}
                     onClick={() => handleItemClick(item.id, item.url)}
