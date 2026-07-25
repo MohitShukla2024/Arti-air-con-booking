@@ -235,22 +235,13 @@ function AdminDashboardContent() {
       });
     } catch {}
 
-    // 1. Notification targeted for CUSTOMER (Status Update)
+    // Notification targeted strictly for CUSTOMER (Status Update)
     useNotificationStore.getState().addNotification({
       title: "Booking Confirmed! 🚀",
       body: `Your booking ${code} has been ACCEPTED. Technician Nitesh Kumar Sharma has been assigned to your address.`,
       url: "/dashboard",
       bookingId: id,
       role: "CUSTOMER",
-    });
-
-    // 2. Notification targeted for ADMIN (Audit Log)
-    useNotificationStore.getState().addNotification({
-      title: `Booking ${code} Accepted`,
-      body: `Booking ${code} accepted and assigned to Technician Nitesh.`,
-      url: "/admin/dashboard",
-      bookingId: id,
-      role: "ADMIN",
     });
 
     setBookings((prev) =>
@@ -268,22 +259,13 @@ function AdminDashboardContent() {
       });
     } catch {}
 
-    // 1. Notification targeted for CUSTOMER
+    // Notification targeted strictly for CUSTOMER
     useNotificationStore.getState().addNotification({
       title: "Booking Cancelled ❌",
       body: `Your booking ${code} could not be accepted and was cancelled.`,
       url: "/dashboard",
       bookingId: id,
       role: "CUSTOMER",
-    });
-
-    // 2. Notification targeted for ADMIN
-    useNotificationStore.getState().addNotification({
-      title: `Booking ${code} Rejected`,
-      body: `Booking ${code} rejected by admin.`,
-      url: "/admin/dashboard",
-      bookingId: id,
-      role: "ADMIN",
     });
 
     setBookings((prev) =>
@@ -301,22 +283,13 @@ function AdminDashboardContent() {
       });
     } catch {}
 
-    // 1. Notification targeted for CUSTOMER
+    // Notification targeted strictly for CUSTOMER
     useNotificationStore.getState().addNotification({
-      title: "Service Completed! ✅",
+      title: "Booking Completed ✅",
       body: `Your AC service for booking ${code} has been marked COMPLETED. Thank you for choosing Arti Air Con!`,
       url: "/dashboard",
       bookingId: id,
       role: "CUSTOMER",
-    });
-
-    // 2. Notification targeted for ADMIN
-    useNotificationStore.getState().addNotification({
-      title: `Booking ${code} Completed`,
-      body: `Booking ${code} service completed successfully.`,
-      url: "/admin/dashboard",
-      bookingId: id,
-      role: "ADMIN",
     });
 
     setBookings((prev) =>
