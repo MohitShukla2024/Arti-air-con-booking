@@ -13,14 +13,14 @@ export interface StoredUser extends SessionUser {
 // In-memory store fallback for demo & offline mode
 const memoryUsers: Map<string, StoredUser> = new Map();
 
-// Default Super Admin User (scrypt hashed password for 'admin25')
+// Default Super Admin User (scrypt hashed password for 'Arti@22')
 const DEFAULT_ADMIN: StoredUser = {
   id: "admin-master-001",
   fullName: "Super Admin",
   mobileNumber: "9264173334",
   email: "admin@artiaircon.com",
   role: "ADMIN",
-  passwordHash: "1d5aefc768f2290c7894131645ed5a96:05cc2f9fc4747215355f346fdbe7835992d4c59b6b98121ed248e2930c37811f8c4c4c4c1e7982c8a65017c3c85182bf9cb045106e9dd4094840d45494b980df",
+  passwordHash: "874e3ee66f7dadea79789690d30a97eb:f6715dd185e5a86fdd6c68b2826e3765d45223d23e8a602fb947fff448ce9061d9e1d7fb051a5500c53700a80c77ecb3e07ef6c985af90717e5cda08cf304e67",
 };
 
 memoryUsers.set("admin@artiaircon.com", DEFAULT_ADMIN);
