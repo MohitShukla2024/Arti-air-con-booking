@@ -8,7 +8,7 @@ export const BRAND_INFO = {
   emergencyPhone: "8271657738",
   email: "info@artiairco.com",
   address: "Aaya nagar, sunday-market road, H block, phase-6, Bandh road-Market",
-  location: "Gurgaon",
+  location: "Delhi",
   yearsExperience: "15+",
 };
 
@@ -103,7 +103,7 @@ export const TESTIMONIALS_LIST = [
   {
     id: "2",
     name: "Priya Verma",
-    location: "DLF Phase 5, Gurgaon",
+    location: "DLF Phase 5, Aaya nagar, Delhi",
     rating: 5,
     date: "1 week ago",
     comment: "Transparent pricing with zero hidden costs. They showed me the pressure gauge reading before and after filling gas. Highly professional team!",
@@ -112,7 +112,7 @@ export const TESTIMONIALS_LIST = [
   {
     id: "3",
     name: "Amit Patel",
-    location: "Golf Course Road, Gurgaon",
+    location: "Golf Course Road, Budh Vihar",
     rating: 5,
     date: "2 weeks ago",
     comment: "Installed 3 new Daikin AC units at my workplace. Neat wiring, proper vacuuming, and great behavior. Recommended for commercial & residential setup.",

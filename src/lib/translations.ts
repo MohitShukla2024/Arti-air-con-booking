@@ -15,8 +15,8 @@ export const TRANSLATIONS = {
     langToggle: "हिन्दी",
 
     // Hero Section
-    heroBadge: "★ 4.9 Rated AC Service in Gurgaon",
-    heroTitle: "Fast & Reliable AC Service in Gurgaon",
+    heroBadge: "★ 4.9 Rated AC Service",
+    heroTitle: "Fast & Reliable AC Service",
     heroSubtitle: "Doorstep AC repair, jet cleaning, gas charging & installation by certified technicians. 30-minute response guarantee.",
     heroBookCta: "Book AC Service Now",
     heroCallCta: "Emergency Call",
@@ -56,12 +56,12 @@ export const TRANSLATIONS = {
 
     // Reviews Section
     reviewsTag: "CUSTOMER REVIEWS",
-    reviewsTitle: "Loved by 15,000+ Gurgaon Families",
+    reviewsTitle: "Loved by 15,000+ Families",
     reviewsSubtitle: "Real feedback from verified homeowners and businesses across Gurgaon.",
     starRatingText: "4.9 / 5 Stars Verified Customer Reviews",
 
     // Footer
-    footerBrandDesc: "Gurgaon's #1 trusted AC service and repair platform. Certified technicians, transparent pricing, and 30-minute doorstep arrival.",
+    footerBrandDesc: "#1 trusted AC service and repair platform. Certified technicians, transparent pricing, and 30-minute doorstep arrival.",
     footerServicesHeader: "Popular Services",
     footerQuickLinksHeader: "Quick Links",
     footerContactHeader: "Contact Support",

@@ -307,7 +307,7 @@ export default function HomePage() {
             <span>4.9 / 5 Stars Verified Customer Reviews</span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#191c1e]">
-            Trusted by 15,000+ Gurgaon Families
+            Trusted by 15,000+ Families
           </h2>
           <p className="text-[#424656] text-sm sm:text-base">
             See real feedback from verified homeowners and office clients.

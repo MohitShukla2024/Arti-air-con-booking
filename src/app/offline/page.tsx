@@ -51,7 +51,7 @@ export default function OfflinePage() {
 
         <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-500">
           <Phone className="w-3.5 h-3.5 text-[#0066ff]" />
-          <span>Emergency Support: <strong>+91 99999 99999</strong></span>
+          <span>Emergency Support: <strong>+91 9264173334</strong></span>
         </div>
       </div>
     </div>
