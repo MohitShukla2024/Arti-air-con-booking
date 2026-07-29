@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Loader2, Lock, User, KeyRound, Eye, EyeOff, CalendarCheck } from "lucide-react";
 import toast from "react-hot-toast";
@@ -428,13 +429,13 @@ function CustomerLoginFormContent() {
               />
               <label htmlFor="terms" className="text-xs text-[#424656] leading-relaxed">
                 I agree to the{" "}
-                <a href="#" className="text-[#0050cb] hover:underline font-semibold">
+                <Link href="/terms-of-use" className="text-[#0050cb] hover:underline font-semibold">
                   Terms of Service
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a href="#" className="text-[#0050cb] hover:underline font-semibold">
+                <Link href="/privacy-policy" className="text-[#0050cb] hover:underline font-semibold">
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </label>
             </div>

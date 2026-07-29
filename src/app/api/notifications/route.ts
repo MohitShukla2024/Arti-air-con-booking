@@ -14,14 +14,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, notifications: [], unreadCount: 0 });
     }
 
-    // Query notifications by specific userId OR matching role
+    // SECURITY (M-02): Customer role must only see their own notifications (by userId).
+    // Admin role uses role-based query to receive broadcast notifications.
+    const where =
+      user.role === "ADMIN"
+        ? { OR: [{ userId: user.id }, { role: user.role as Role, userId: null }] }
+        : { userId: user.id };
+
     const notifications = await prisma.notification.findMany({
-      where: {
-        OR: [
-          { userId: user.id },
-          { role: user.role as Role },
-        ],
-      },
+      where,
       orderBy: { createdAt: "desc" },
       take: 50,
     });

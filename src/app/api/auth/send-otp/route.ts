@@ -20,9 +20,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const code = generateOTP(parsed.data.mobileNumber);
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`[DEV OTP SENT] Mobile: ${parsed.data.mobileNumber} -> OTP Code: ${code}`);
+    try {
+      const code = await generateOTP(parsed.data.mobileNumber);
+      if (process.env.NODE_ENV !== "production") {
+        console.log(`[DEV OTP SENT] Mobile: ${parsed.data.mobileNumber} -> OTP Code: ${code}`);
+      }
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Unable to send OTP code. Please try again." },
+        { status: 503 }
+      );
     }
 
     return NextResponse.json({

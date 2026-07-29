@@ -22,8 +22,13 @@ async function getSettingsRecord() {
   return { ...normalized, adminPasscode: "" };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // SECURITY (H-05): Settings data includes technician phone/name and pricing.
+    // Require authentication — only authenticated users (any role) can read settings.
+    const user = await getRequestUser(request);
+    if (!user) return unauthorizedResponse();
+
     const settings = await getSettingsRecord();
     return NextResponse.json({ success: true, settings });
   } catch (error) {

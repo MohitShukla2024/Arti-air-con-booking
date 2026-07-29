@@ -2,14 +2,34 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { getRequestUser, unauthorizedResponse } from "@/lib/request-auth";
 import { handleServerError } from "@/lib/error-handler";
+import { z } from "zod";
+import { nameSchema, optionalEmailSchema } from "@/validators/common.schema";
+
+// SECURITY (H-04): Strict Zod schema for profile updates
+const profileUpdateSchema = z.object({
+  fullName: nameSchema.optional(),
+  email: optionalEmailSchema,
+});
 
 export async function PUT(request: Request) {
   try {
     const user = await getRequestUser(request);
     if (!user) return unauthorizedResponse();
 
-    const body = await request.json();
-    const { fullName, email } = body;
+    // SECURITY (H-04): Validate and sanitize input via Zod before any DB write.
+    // Previously raw request.json() was passed directly to prisma.user.update()
+    // which allowed stored XSS payloads and unbounded string lengths.
+    const rawBody = await request.json();
+    const parsed = profileUpdateSchema.safeParse(rawBody);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, message: "Invalid profile data.", errors: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { fullName, email } = parsed.data;
 
     const prisma = getPrisma();
     if (prisma && user.id) {

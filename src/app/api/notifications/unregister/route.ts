@@ -3,11 +3,17 @@ import { getRequestUser, unauthorizedResponse } from "@/lib/request-auth";
 import { getPrisma } from "@/lib/prisma";
 import { removeInMemoryFcmToken } from "@/lib/fcm-store";
 import { handleServerError } from "@/lib/error-handler";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 
 export async function POST(request: Request) {
   try {
     const user = await getRequestUser(request);
     if (!user) return unauthorizedResponse();
+
+    // SECURITY (H-03): Apply rate limiting on unregister as well
+    const rateLimit = checkRateLimit(request, RATE_LIMIT_CONFIGS.FCM_TOKEN_REGISTER, user.id);
+    if (!rateLimit.allowed) return rateLimit.response!;
 
     const body = (await request.json()) as { fcmToken?: string };
     const { fcmToken } = body;
@@ -21,7 +27,7 @@ export async function POST(request: Request) {
     // 1. Remove from memory store
     removeInMemoryFcmToken(cleanToken);
 
-    // 2. Remove from Database if available
+    // 2. Remove from Database if available — scoped to current user for safety
     const prisma = getPrisma();
     if (prisma) {
       try {

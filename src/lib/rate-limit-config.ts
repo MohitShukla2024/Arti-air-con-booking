@@ -77,4 +77,12 @@ export const RATE_LIMIT_CONFIGS = {
     windowMs: 60 * 60 * 1000, // 1 hour
     actionName: "settings modifications",
   },
+
+  /** FCM Token Registration: 10 registrations per user per hour */
+  FCM_TOKEN_REGISTER: {
+    prefix: "fcm_register",
+    limit: 10,
+    windowMs: 60 * 60 * 1000, // 1 hour
+    actionName: "token registrations",
+  },
 } as const satisfies Record<string, RateLimitRule>;

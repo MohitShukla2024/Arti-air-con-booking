@@ -34,7 +34,21 @@ export const metadata: Metadata = {
   title: "Arti Air Con | Professional AC Services",
   description: "Get expert care for your air conditioner today. From routine maintenance to complex repairs, we ensure your home stays cool and comfortable.",
   keywords: ["AC repair", "AC service", "Air conditioning", "Arti Air Con", "AC installation", "Gas filling"],
-  manifest: "/manifest.webmanifest",
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    other: [
+      { rel: "android-chrome-192x192", url: "/android-chrome-192.png" },
+      { rel: "android-chrome-512x512", url: "/android-chrome-512.png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -45,7 +59,7 @@ export const metadata: Metadata = {
     description: "Expert air conditioner repair, installation, and maintenance services.",
     url: "https://artiaircon.com",
     siteName: "Arti Air Con",
-    locale: "en_US",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {

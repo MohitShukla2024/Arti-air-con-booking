@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "node scripts/inject-sw-config.mjs",
     "build": "next build",
+    "prebuild": "node scripts/inject-sw-config.mjs && prisma generate",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",

@@ -112,9 +112,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const year = new Date().getFullYear();
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const bookingCode = `#ART-${year}-${randomNum}`;
+    // SECURITY (M-01): Use crypto.randomBytes for booking code generation.
+    // Math.random() only produced 9000 possible codes per year — enumerable.
+    // randomBytes(4) provides ~4 billion unique codes, making enumeration infeasible.
+    const { randomBytes } = await import("crypto");
+    const bookingCode = `#ART-${randomBytes(4).toString("hex").toUpperCase()}`;
 
     // Resolve pricing based on service type (#30)
     const amount = resolveAmount(parsed.data.serviceType);

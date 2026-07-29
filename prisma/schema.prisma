@@ -107,6 +107,17 @@ model TechnicianActivity {
   timestamp         DateTime @default(now())
 }
 
+model Otp {
+  id           String   @id @default(uuid())
+  mobileNumber String   @unique
+  codeHash     String
+  expiresAt    DateTime
+  attempts     Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([mobileNumber])
+}
+
 model SiteSetting {
   id                    String   @id
   brandName             String

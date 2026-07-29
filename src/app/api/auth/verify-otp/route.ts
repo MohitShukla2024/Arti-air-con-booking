@@ -33,8 +33,8 @@ export async function POST(request: Request) {
 
     const mobileNumber = rawMobile.replace(/[\s-]/g, "");
 
-    // Verify OTP dynamically against stored timed OTP
-    const otpResult = verifyOTP(mobileNumber, parsed.data.otp);
+    // Verify OTP dynamically against stored timed OTP (now DB-backed)
+    const otpResult = await verifyOTP(mobileNumber, parsed.data.otp);
     if (!otpResult.success) {
       return NextResponse.json(
         { success: false, message: otpResult.message },

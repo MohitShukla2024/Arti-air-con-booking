@@ -13,7 +13,15 @@ type SessionPayload = SessionUser & { exp: number };
 
 function getSessionSecret(): string {
   const secret = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET;
-  return secret || "arti-air-con-super-secret-key-production-2026-secure-32chars-fallback";
+  if (!secret) {
+    // SECURITY (C-02): Never fall back to a hardcoded string.
+    // A missing secret in production is a critical misconfiguration — fail loudly.
+    throw new Error(
+      "[Auth] SESSION_SECRET environment variable is not set. " +
+      "Set it in your .env file or Vercel Environment Variables before starting the server."
+    );
+  }
+  return secret;
 }
 
 function base64urlEncode(str: string): string {
@@ -93,7 +101,9 @@ export function sessionCookieOptions(remember?: boolean) {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
+    // SECURITY (M-05): SameSite=strict prevents the cookie from being sent on any
+    // cross-site navigation, providing strong CSRF protection.
+    sameSite: "strict" as const,
     path: "/",
     ...(maxAge !== undefined ? { maxAge } : {}),
   };

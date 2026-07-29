@@ -65,7 +65,8 @@ export const TRANSLATIONS = {
     footerServicesHeader: "Popular Services",
     footerQuickLinksHeader: "Quick Links",
     footerContactHeader: "Contact Support",
-    footerCopyright: "Arti Air Con. All rights reserved.",
+    footerLegalHeader: "Legal",
+    footerCopyright: "All rights reserved.",
   },
   hi: {
     // Header & Navigation
@@ -131,6 +132,7 @@ export const TRANSLATIONS = {
     footerServicesHeader: "लोकप्रिय सेवाएं",
     footerQuickLinksHeader: "त्वरित लिंक",
     footerContactHeader: "सहायता संपर्क",
-    footerCopyright: "आरती एयर कॉन। सर्वाधिकार सुरक्षित।",
+    footerLegalHeader: "कानूनी",
+    footerCopyright: "सर्वाधिकार सुरक्षित।",
   },
 };

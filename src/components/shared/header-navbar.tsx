@@ -109,19 +109,19 @@ export function HeaderNavbar({ variant = "public" }: HeaderNavbarProps = {}) {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-          <Link href="/" className="text-sm font-semibold text-[#555f6c] hover:text-[#0050cb] transition-all">
-            {t.navHome}
-          </Link>
-          <Link href="/#services" className="text-sm font-semibold text-[#555f6c] hover:text-[#0050cb] transition-all">
-            {t.navServices}
-          </Link>
-          <Link href="/#pricing" className="text-sm font-semibold text-[#555f6c] hover:text-[#0050cb] transition-all">
-            {t.navPricing}
-          </Link>
+        <nav className="hidden md:flex items-center gap-5 lg:gap-7" aria-label="Main navigation">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-sm font-semibold text-[#555f6c] hover:text-[#0050cb] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0066ff] rounded px-1.5 py-1"
+            >
+              {link.name}
+            </Link>
+          ))}
           <button
             onClick={handleBookNav}
-            className="text-sm font-semibold text-[#0050cb] hover:underline flex items-center gap-1"
+            className="text-sm font-semibold text-[#0050cb] hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0066ff] rounded px-1.5 py-1"
           >
             <CalendarPlus className="w-4 h-4" /> {t.navBook}
           </button>

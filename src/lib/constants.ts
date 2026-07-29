@@ -16,7 +16,9 @@ export const NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/#services" },
   { name: "Pricing", href: "/#pricing" },
+  { name: "About Us", href: "/#about" },
   { name: "FAQ", href: "/#faq" },
+  { name: "Contact Us", href: "/#contact" },
 ];
 
 export const SERVICES_LIST = [

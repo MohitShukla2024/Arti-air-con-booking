@@ -9,7 +9,7 @@ export function TrustBadgesSection() {
   ];
 
   return (
-    <section className="bg-[#f2f4f6] py-12 border-y border-[#c2c6d8]/30">
+    <section id="about" className="scroll-mt-24 bg-[#f2f4f6] py-12 border-y border-[#c2c6d8]/30">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {trustFactors.map((factor) => {
