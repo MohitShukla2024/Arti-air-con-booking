@@ -15,7 +15,10 @@ const svg = readFileSync(svgPath);
 const outputs = [
   { path: "public/favicon-16x16.png", size: 16 },
   { path: "public/favicon-32x32.png", size: 32 },
+  { path: "public/favicon-48x48.png", size: 48 },
   { path: "public/apple-touch-icon.png", size: 180 },
+  { path: "public/android-chrome-192x192.png", size: 192 },
+  { path: "public/android-chrome-512x512.png", size: 512 },
   { path: "public/android-chrome-192.png", size: 192 },
   { path: "public/android-chrome-512.png", size: 512 },
   { path: "public/icons/icon-192.png", size: 192 },
