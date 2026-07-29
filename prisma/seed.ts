@@ -14,7 +14,7 @@ async function main() {
     create: {
       fullName: "Nitesh Kumar Sharma",
       mobileNumber: "+91 98765 43210",
-      email: "admin@artiaircon.com",
+      email: "admin@artiair.com",
       role: "ADMIN",
       passwordHash: "874e3ee66f7dadea79789690d30a97eb:f6715dd185e5a86fdd6c68b2826e3765d45223d23e8a602fb947fff448ce9061d9e1d7fb051a5500c53700a80c77ecb3e07ef6c985af90717e5cda08cf304e67",
       languagePref: "en",

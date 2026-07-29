@@ -367,7 +367,7 @@ export default function AdminLoginPage() {
                 <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#c2c6d8]" />
                 <input
                   type="text"
-                  placeholder="admin@artiaircon.com"
+                  placeholder="admin@artiair.com"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   required

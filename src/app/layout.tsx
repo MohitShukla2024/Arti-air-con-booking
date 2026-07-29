@@ -30,7 +30,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://artiaircon.com"),
+  metadataBase: new URL("https://artiair.com"),
   title: "Arti Air Con | Professional AC Services",
   description: "Get expert care for your air conditioner today. From routine maintenance to complex repairs, we ensure your home stays cool and comfortable.",
   keywords: ["AC repair", "AC service", "Air conditioning", "Arti Air Con", "AC installation", "Gas filling"],
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Arti Air Con | Professional AC Services",
     description: "Expert air conditioner repair, installation, and maintenance services.",
-    url: "https://artiaircon.com",
+    url: "https://artiair.com",
     siteName: "Arti Air Con",
     locale: "en_IN",
     type: "website",

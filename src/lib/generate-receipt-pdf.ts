@@ -400,7 +400,7 @@ export function generateReceiptPDF(booking: ServiceBooking, customerName?: strin
   doc.text("|", W / 2, footerY + 7, { align: "center" });
   doc.text("+91 9264173334", W / 2 + 6, footerY + 7);
   doc.text("|", W - 60, footerY + 7);
-  doc.text("www.artiaircon.com", W - 14, footerY + 7, { align: "right" });
+  doc.text("www.artiair.com", W - 14, footerY + 7, { align: "right" });
 
   doc.setFontSize(6.5);
   doc.setTextColor(148, 163, 184);

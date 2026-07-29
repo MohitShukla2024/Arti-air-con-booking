@@ -24,7 +24,7 @@ export const TERMS_OF_USE: LegalPageContent = {
       id: "acceptance",
       title: "1. Acceptance of Terms",
       paragraphs: [
-        "By accessing artiaircon.com, creating a customer account, or booking a service through Arti Air Con, you confirm that you have read, understood, and agree to be bound by these Terms of Use and our Privacy Policy.",
+        "By accessing artiair.com, creating a customer account, or booking a service through Arti Air Con, you confirm that you have read, understood, and agree to be bound by these Terms of Use and our Privacy Policy.",
         "If you do not agree with any part of these terms, please do not use our website or booking services.",
       ],
     },
@@ -150,7 +150,7 @@ export const TERMS_OF_USE: LegalPageContent = {
         "For questions about these Terms of Use, contact Arti Air Con:",
         "Phone: +91 9264173334",
         "WhatsApp: +91 8271876176",
-        "Email: info@artiairco.com",
+        "Email: info@artiair.com",
         "Address: Aaya nagar, sunday-market road, H block, phase-6, Bandh road-Market, Delhi",
       ],
     },
@@ -267,7 +267,7 @@ export const PRIVACY_POLICY: LegalPageContent = {
       title: "14. Contact Us",
       paragraphs: [
         "For privacy-related questions, contact:",
-        "Email: info@artiairco.com",
+        "Email: info@artiair.com",
         "Phone: +91 9264173334",
         "Address: Aaya nagar, sunday-market road, H block, phase-6, Bandh road-Market, Delhi",
       ],
@@ -329,7 +329,7 @@ export const COOKIE_POLICY: LegalPageContent = {
       id: "contact",
       title: "7. Contact",
       paragraphs: [
-        "Questions about this Cookie Policy can be sent to info@artiairco.com or +91 9264173334.",
+        "Questions about this Cookie Policy can be sent to info@artiair.com or +91 9264173334.",
       ],
     },
   ],
@@ -392,7 +392,7 @@ export const DISCLAIMER: LegalPageContent = {
       id: "contact",
       title: "7. Contact",
       paragraphs: [
-        "For service clarification, contact Arti Air Con at +91 9264173334 or info@artiairco.com.",
+        "For service clarification, contact Arti Air Con at +91 9264173334 or info@artiair.com.",
       ],
     },
   ],
@@ -457,7 +457,7 @@ export const REFUND_POLICY: LegalPageContent = {
       paragraphs: [
         "Phone: +91 9264173334",
         "WhatsApp: +91 8271876176",
-        "Email: info@artiairco.com",
+        "Email: info@artiair.com",
       ],
     },
   ],
@@ -502,7 +502,7 @@ export const SHIPPING_POLICY: LegalPageContent = {
       id: "contact",
       title: "5. Contact",
       paragraphs: [
-        "For service area or appointment questions, contact +91 9264173334 or info@artiairco.com.",
+        "For service area or appointment questions, contact +91 9264173334 or info@artiair.com.",
       ],
     },
   ],

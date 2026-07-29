@@ -9,7 +9,7 @@ import { RATE_LIMIT_CONFIGS } from "@/lib/rate-limit-config";
 
 function normalizeAdminEmail(value: string) {
   const trimmed = value.trim().toLowerCase();
-  return trimmed.includes("@") ? trimmed : `${trimmed}@artiaircon.com`;
+  return trimmed.includes("@") ? trimmed : `${trimmed}@artiair.com`;
 }
 
 export async function POST(request: Request) {

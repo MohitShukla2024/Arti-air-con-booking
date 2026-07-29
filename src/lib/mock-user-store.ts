@@ -18,12 +18,12 @@ const DEFAULT_ADMIN: StoredUser = {
   id: "admin-master-001",
   fullName: "Super Admin",
   mobileNumber: "9264173334",
-  email: "admin@artiaircon.com",
+  email: "admin@artiair.com",
   role: "ADMIN",
   passwordHash: "874e3ee66f7dadea79789690d30a97eb:f6715dd185e5a86fdd6c68b2826e3765d45223d23e8a602fb947fff448ce9061d9e1d7fb051a5500c53700a80c77ecb3e07ef6c985af90717e5cda08cf304e67",
 };
 
-memoryUsers.set("admin@artiaircon.com", DEFAULT_ADMIN);
+memoryUsers.set("admin@artiair.com", DEFAULT_ADMIN);
 memoryUsers.set("admin", DEFAULT_ADMIN);
 memoryUsers.set("9264173334", DEFAULT_ADMIN);
 

@@ -6,7 +6,7 @@ export const BRAND_INFO = {
   phoneRaw: "+919264173334",
   whatsapp: "+91 8271876176",
   emergencyPhone: "8271657738",
-  email: "info@artiairco.com",
+  email: "info@artiair.com",
   address: "Aaya nagar, sunday-market road, H block, phase-6, Bandh road-Market",
   location: "Delhi",
   yearsExperience: "15+",

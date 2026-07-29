@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL = "https://artiaircon.com";
+const BASE_URL = "https://artiair.com";
 
 export function createLegalMetadata({
   title,
