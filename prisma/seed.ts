@@ -7,8 +7,10 @@ async function main() {
 
   // Seed Master Admin User (9264173334)
   await prisma.user.upsert({
-    where: { mobileNumber: "9264173334" },
+    where: { email: "admin@artiair.com" },
     update: {
+      mobileNumber: "9264173334",
+      role: "ADMIN",
       passwordHash: "874e3ee66f7dadea79789690d30a97eb:f6715dd185e5a86fdd6c68b2826e3765d45223d23e8a602fb947fff448ce9061d9e1d7fb051a5500c53700a80c77ecb3e07ef6c985af90717e5cda08cf304e67",
     },
     create: {
