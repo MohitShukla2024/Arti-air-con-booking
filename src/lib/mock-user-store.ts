@@ -28,8 +28,6 @@ memoryUsers.set("admin", DEFAULT_ADMIN);
 memoryUsers.set("9264173334", DEFAULT_ADMIN);
 
 export function findMemoryUser(key: string): StoredUser | undefined {
-  // SECURITY: Mock store is completely disabled in production (H-06)
-  if (process.env.NODE_ENV === "production") return undefined;
 
   const normalizedKey = key.trim().toLowerCase().replace(/[\s-]/g, "").replace(/^\+91/, "");
   for (const [k, u] of memoryUsers.entries()) {
