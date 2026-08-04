@@ -101,9 +101,8 @@ export function sessionCookieOptions(remember?: boolean) {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    // SECURITY (M-05): SameSite=strict prevents the cookie from being sent on any
-    // cross-site navigation, providing strong CSRF protection.
-    sameSite: "strict" as const,
+    // SameSite=lax ensures session cookies persist across mobile page redirects and navigation
+    sameSite: "lax" as const,
     path: "/",
     ...(maxAge !== undefined ? { maxAge } : {}),
   };

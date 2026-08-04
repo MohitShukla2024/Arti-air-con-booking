@@ -41,7 +41,8 @@ export default function AdminLoginPage() {
   // Handle Admin Login Submit
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!adminId) {
+    const cleanAdminId = adminId.trim();
+    if (!cleanAdminId) {
       toast.error("Please enter your Admin ID or Email");
       return;
     }
@@ -56,7 +57,7 @@ export default function AdminLoginPage() {
       const response = await fetch("/api/auth/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminId, password, remember }),
+        body: JSON.stringify({ adminId: cleanAdminId, password, remember }),
       });
 
       const data = await response.json();
@@ -70,8 +71,8 @@ export default function AdminLoginPage() {
       toast.success("Admin authenticated! Opening Admin Hub...");
 
       setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 500);
+        window.location.replace("/admin/dashboard");
+      }, 400);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to authenticate admin.");
     } finally {
@@ -207,6 +208,9 @@ export default function AdminLoginPage() {
                   onChange={(e) => setAdminId(e.target.value)}
                   placeholder="Enter admin ID or email"
                   required
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   className="w-full pl-12 pr-4 py-3.5 bg-white border border-[#c2c6d8] rounded-xl text-sm text-[#191c1e] placeholder:text-[#c2c6d8] focus:outline-none focus:border-[#0050cb] focus:ring-2 focus:ring-[#0066ff]/10 transition-all"
                 />
               </div>

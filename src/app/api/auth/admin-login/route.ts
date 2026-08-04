@@ -23,12 +23,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const adminId = parsed.data.adminId.trim();
+    const rawAdminId = parsed.data.adminId.trim();
+    const cleanMobile = rawAdminId.replace(/[\s-]/g, "").replace(/^\+91/, "");
     let admin: { id: string; fullName: string; mobileNumber: string; email: string | null; role: string; passwordHash?: string | null; languagePref?: string } | null = null;
 
     try {
       admin = await prisma.user.findFirst({
-        where: { role: "ADMIN", OR: [{ email: adminId.toLowerCase() }, { mobileNumber: adminId.replace(/[\s-]/g, "") }] },
+        where: {
+          role: "ADMIN",
+          OR: [
+            { email: rawAdminId.toLowerCase() },
+            { mobileNumber: rawAdminId },
+            { mobileNumber: cleanMobile },
+            { mobileNumber: `+91${cleanMobile}` },
+            { mobileNumber: `+91 ${cleanMobile}` },
+          ],
+        },
       });
     } catch {
       // DB offline fallback
@@ -61,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Check Memory Admin (Master Admin Fallback Mode)
-    const memoryAdmin = findMemoryUser(adminId);
+    const memoryAdmin = findMemoryUser(rawAdminId);
     if (memoryAdmin && memoryAdmin.role === "ADMIN") {
       if (memoryAdmin.passwordHash && (await verifyPassword(parsed.data.password, memoryAdmin.passwordHash))) {
         const response = NextResponse.json({ success: true, admin: memoryAdmin });
