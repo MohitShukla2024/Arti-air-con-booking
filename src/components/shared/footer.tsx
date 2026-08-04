@@ -9,6 +9,7 @@ import {
   Mail,
   MessageSquare,
   Clock,
+  Shield,
 } from "lucide-react";
 import { useSettingsStore } from "@/store/use-settings-store";
 import { useLanguageStore } from "@/store/use-language-store";
@@ -119,6 +120,12 @@ export function Footer() {
             <li>
               <Link href="/login" className="hover:text-[#0050cb] font-semibold transition-colors focus:outline-none focus-visible:underline">
                 {t.navLogin}
+              </Link>
+            </li>
+            <li>
+              <Link href="/admin/login" className="hover:text-[#0050cb] font-semibold transition-colors focus:outline-none focus-visible:underline flex items-center gap-1.5 text-xs text-[#0050cb]/90 hover:text-[#0050cb] mt-1">
+                <Shield className="w-3.5 h-3.5 shrink-0" />
+                <span>Admin Login</span>
               </Link>
             </li>
           </ul>
